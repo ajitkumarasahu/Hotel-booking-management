@@ -6,6 +6,8 @@ import com.osrtc.bustracking.util.DBConnection;
 import java.sql.*;
 import java.util.*;
 
+import javax.ws.rs.core.Response;
+
 /**
  * Data Access Object for Driver entities.
  * Handles CRUD operations, batch operations, and status updates for the "driver" table.
@@ -72,30 +74,42 @@ public class DriverDAO {
      * @return true if insertion succeeded
      */
     public boolean addDriver(Driver d) {
+
+        System.out.println("Driver received: " + d.getDriverName());
+
         String sql = "INSERT INTO driver(driver_name, phone, license_number) VALUES(?,?,?)";
+
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, d.getDriverName());
             ps.setString(2, d.getPhone());
             ps.setString(3, d.getLicenseNumber());
 
             int affected = ps.executeUpdate();
+
+            System.out.println("Rows affected: " + affected);
+
             if (affected > 0) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
-                        d.setDriverId(keys.getInt(1)); // set auto-generated ID
+                        d.setDriverId(keys.getInt(1));
                     }
                 }
+                return true;
             }
 
-            return affected > 0;
-
+        } catch (SQLException e) {
+            // 🔥 THIS is what you were missing
+            System.err.println("SQL ERROR: " + e.getMessage());
+            e.printStackTrace();
         } catch (Exception e) {
             e.printStackTrace();
         }
+
         return false;
     }
+
 
     /**
      * Insert multiple drivers in batch.
