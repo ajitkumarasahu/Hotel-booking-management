@@ -1,0 +1,78 @@
+# Docker Compose file format version
+# 3.8 is stable and commonly used with Docker Engine
+version: '3.8'
+
+# Define all containers (services) used in the application
+services:
+
+  # =========================
+  # MySQL Database Service
+  # =========================
+  mysql-db:
+    # Use official MySQL 8.0 image
+    image: mysql:8.0
+
+    # Name of the MySQL container
+    container_name: osrtc-mysql
+
+    # Always restart the container if it stops or crashes
+    restart: always
+
+    # Environment variables required by MySQL image
+    environment:
+      # Root password for MySQL
+      MYSQL_ROOT_PASSWORD: root
+
+      # Database created automatically at container startup
+      MYSQL_DATABASE: osrtc_db
+
+    # Port mapping:
+    # Host port 3307 → Container port 3306 (MySQL default)
+    # Connect from your system using port 3307
+    ports:
+      - "3307:3306"
+
+    # Persistent volume for MySQL data
+    # Prevents data loss when container stops or restarts
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  # =========================
+  # OSRTC Java / Tomcat App
+  # =========================
+  osrtc-app:
+    # Build Docker image using Dockerfile in current directory
+    build: .
+
+    # Name of the application container
+    container_name: osrtc-app
+
+    # Start this service only after mysql-db container starts
+    depends_on:
+      - mysql-db
+
+    # Port mapping:
+    # Host port 8080 → Container port 8080 (Tomcat)
+    ports:
+      - "8080:8080"
+
+    # Environment variables passed to Java application
+    environment:
+      # JDBC URL:
+      # mysql-db is the MySQL service name (Docker network DNS)
+      DB_URL: jdbc:mysql://mysql-db:3306/osrtc_db
+
+      # Database username
+      DB_USER: root
+
+      # Database password
+      DB_PASSWORD: 
+
+# =========================
+# Docker Volumes
+# =========================
+volumes:
+  # Named volume for MySQL data storage
+  mysql_data:
+   - ./logs:/usr/local/tomcat/logs
+

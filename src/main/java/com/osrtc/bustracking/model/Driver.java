@@ -1,10 +1,14 @@
 package com.osrtc.bustracking.model;
 
+import java.util.logging.Logger;
+
 /**
  * Represents a Driver entity in the OSRTC Bus Tracking System.
  * Stores driver details such as name, contact, license, and current status.
  */
 public class Driver {
+
+    private static final Logger logger = Logger.getLogger(Driver.class.getName());
 
     /** Unique identifier for the driver */
     private int driverId;
@@ -21,83 +25,63 @@ public class Driver {
     /** Current status of the driver (e.g., active, inactive) */
     private String status;
 
-    /**
-     * Gets the unique driver ID.
-     * @return driverId
-     */
-    public int getDriverId() { 
-        return driverId; 
+    /** Gets the unique driver ID. */
+    public int getDriverId() {
+        logger.info("Getting driverId: " + driverId);
+        return driverId;
     }
 
-    /**
-     * Sets the unique driver ID.
-     * @param driverId the ID to set
-     */
-    public void setDriverId(int driverId) { 
-        this.driverId = driverId; 
+    /** Sets the unique driver ID. */
+    public void setDriverId(int driverId) {
+        logger.info("Setting driverId: " + driverId);
+        this.driverId = driverId;
     }
 
-    /**
-     * Gets the driver's full name.
-     * @return driverName
-     */
-    public String getDriverName() { 
-        return driverName; 
+    /** Gets the driver's full name. */
+    public String getDriverName() {
+        logger.info("Getting driverName: " + driverName);
+        return driverName;
     }
 
-    /**
-     * Sets the driver's full name.
-     * @param driverName the name to set
-     */
-    public void setDriverName(String driverName) { 
-        this.driverName = driverName; 
+    /** Sets the driver's full name. */
+    public void setDriverName(String driverName) {
+        logger.info("Setting driverName: " + driverName);
+        this.driverName = driverName;
     }
 
-    /**
-     * Gets the driver's phone number.
-     * @return phone
-     */
-    public String getPhone() { 
-        return phone; 
+    /** Gets the driver's phone number. */
+    public String getPhone() {
+        logger.info("Getting phone: " + phone);
+        return phone;
     }
 
-    /**
-     * Sets the driver's phone number.
-     * @param phone the phone number to set
-     */
-    public void setPhone(String phone) { 
-        this.phone = phone; 
+    /** Sets the driver's phone number. */
+    public void setPhone(String phone) {
+        logger.info("Setting phone: " + phone);
+        this.phone = phone;
     }
 
-    /**
-     * Gets the driver's license number.
-     * @return licenseNumber
-     */
-    public String getLicenseNumber() { 
-        return licenseNumber; 
+    /** Gets the driver's license number. */
+    public String getLicenseNumber() {
+        logger.info("Getting licenseNumber: " + licenseNumber);
+        return licenseNumber;
     }
 
-    /**
-     * Sets the driver's license number.
-     * @param licenseNumber the license number to set
-     */
-    public void setLicenseNumber(String licenseNumber) { 
-        this.licenseNumber = licenseNumber; 
+    /** Sets the driver's license number. */
+    public void setLicenseNumber(String licenseNumber) {
+        logger.info("Setting licenseNumber: " + licenseNumber);
+        this.licenseNumber = licenseNumber;
     }
 
-    /**
-     * Gets the current status of the driver.
-     * @return status
-     */
-    public String getStatus() { 
-        return status; 
+    /** Gets the current status of the driver. */
+    public String getStatus() {
+        logger.info("Getting status: " + status);
+        return status;
     }
 
-    /**
-     * Sets the current status of the driver.
-     * @param status the status to set
-     */
-    public void setStatus(String status) { 
-        this.status = status; 
+    /** Sets the current status of the driver. */
+    public void setStatus(String status) {
+        logger.info("Setting status: " + status);
+        this.status = status;
     }
 }

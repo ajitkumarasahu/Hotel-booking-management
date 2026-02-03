@@ -2,14 +2,20 @@ package com.osrtc.bustracking.util;
 
 import com.osrtc.bustracking.dao.LocationDAO;
 import com.osrtc.bustracking.model.Location;
+
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Simulates GPS updates for buses.
  * Periodically generates random location data and saves it to the database.
  */
 public class GPSSimulator {
+
+    // Logger for logging updates
+    private static final Logger logger = Logger.getLogger(GPSSimulator.class.getName());
 
     // DAO to persist Location objects in the database
     private static final LocationDAO locationDAO = new LocationDAO();
@@ -56,28 +62,32 @@ public class GPSSimulator {
      */
     private static void updateLocations() {
         for (Integer busId : busIds) {
-            // Get current coordinates
-            double[] coords = busCoordinates.get(busId);
+            try {
+                // Get current coordinates
+                double[] coords = busCoordinates.get(busId);
 
-            // Simulate small random movement
-            coords[0] += (random.nextDouble() - 0.5) * 0.001; // Latitude
-            coords[1] += (random.nextDouble() - 0.5) * 0.001; // Longitude
+                // Simulate small random movement
+                coords[0] += (random.nextDouble() - 0.5) * 0.001; // Latitude
+                coords[1] += (random.nextDouble() - 0.5) * 0.001; // Longitude
 
-            // Create Location object with updated coordinates
-            Location loc = new Location();
-            loc.setBusId(busId);
-            loc.setLatitude(coords[0]);
-            loc.setLongitude(coords[1]);
-            loc.setTimestamp(new Date());
+                // Create Location object with updated coordinates
+                Location loc = new Location();
+                loc.setBusId(busId);
+                loc.setLatitude(coords[0]);
+                loc.setLongitude(coords[1]);
+                loc.setTimestamp(new Date());
 
-            // Persist the location in the database
-            locationDAO.addLocation(loc);
+                // Persist the location in the database
+                locationDAO.addLocation(loc);
 
-            // Print log for debugging
-            System.out.println(
-                "Updated location for Bus " + busId +
-                " -> Lat: " + coords[0] + ", Lng: " + coords[1]
-            );
+                // Log the updated location
+                logger.info("Updated location for Bus " + busId +
+                        " -> Lat: " + coords[0] + ", Lng: " + coords[1]);
+
+            } catch (Exception e) {
+                // Log any exceptions during location update
+                logger.log(Level.SEVERE, "Failed to update location for Bus " + busId, e);
+            }
         }
     }
 }

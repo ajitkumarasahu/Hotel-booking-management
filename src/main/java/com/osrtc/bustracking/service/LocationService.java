@@ -1,9 +1,14 @@
 package com.osrtc.bustracking.service;
+// Declares this class is part of the service layer for location operations
 
 import com.osrtc.bustracking.dao.LocationDAO;
 import com.osrtc.bustracking.dao.BusDAO;
 import com.osrtc.bustracking.model.Location;
+// Imports the DAOs for Location and Bus, and the Location model class
+
 import java.util.List;
+import java.util.logging.Logger;
+// Imports utilities for lists and logging
 
 /**
  * Service layer for Location operations.
@@ -11,65 +16,55 @@ import java.util.List;
  */
 public class LocationService {
 
-    // DAO instance to perform Location-related database operations
+    private static final Logger logger = Logger.getLogger(LocationService.class.getName());
+    // Logger for tracking operations, warnings, and errors
+
     private LocationDAO locationDAO = new LocationDAO();
-
-    // DAO instance to check if the bus exists before adding/fetching locations
     private BusDAO busDAO = new BusDAO();
+    // DAO instances to perform database operations for Location and Bus
 
-    /**
-     * Retrieve all locations from the database.
-     * @return List of all Location objects
-     */
+    // Retrieve all locations in the system
     public List<Location> getAllLocations() {
-        return locationDAO.getAllLocations();
+        logger.info("Fetching all locations");
+        return locationDAO.getAllLocations(); // Delegate to DAO
     }
 
-    /**
-     * Retrieve all locations for a specific bus.
-     * Checks if the bus exists before fetching locations.
-     * @param busId ID of the bus
-     * @return List of Location objects for the given bus
-     * @throws IllegalArgumentException if the bus does not exist
-     */
+    // Retrieve all location records for a specific bus
     public List<Location> getLocationsByBus(int busId) {
+        logger.info("Fetching locations for bus ID: " + busId);
+
         // Validate that the bus exists
         if(busDAO.getBusById(busId) == null) {
+            logger.warning("Bus not found: ID " + busId);
             throw new IllegalArgumentException("Bus not found.");
         }
-        // Fetch locations for the bus
-        return locationDAO.getLocationsByBusId(busId);
+
+        return locationDAO.getLocationsByBusId(busId); // Delegate to DAO
     }
 
-    /**
-     * Retrieve the latest location of a specific bus.
-     * Checks if the bus exists first.
-     * @param busId ID of the bus
-     * @return Latest Location object for the bus
-     * @throws IllegalArgumentException if the bus does not exist
-     */
+    // Get the most recent location for a specific bus
     public Location getLatestLocation(int busId) {
-        // Validate that the bus exists
+        logger.info("Fetching latest location for bus ID: " + busId);
+
+        // Validate bus existence
         if(busDAO.getBusById(busId) == null) {
+            logger.warning("Bus not found: ID " + busId);
             throw new IllegalArgumentException("Bus not found.");
         }
-        // Fetch the latest location for the bus
-        return locationDAO.getLatestLocationByBusId(busId);
+
+        return locationDAO.getLatestLocationByBusId(busId); // Delegate to DAO
     }
 
-    /**
-     * Add a new location for a bus.
-     * Ensures the bus exists before inserting the location.
-     * @param location Location object to add
-     * @return true if the location was added successfully
-     * @throws IllegalArgumentException if the bus does not exist
-     */
+    // Add a new location record for a bus
     public boolean addLocation(Location location) {
-        // Validate that the bus exists
+        logger.info("Adding new location for bus ID: " + location.getBusId());
+
+        // Ensure the bus exists before adding a location
         if(busDAO.getBusById(location.getBusId()) == null) {
+            logger.warning("Cannot add location. Bus not found: ID " + location.getBusId());
             throw new IllegalArgumentException("Bus not found.");
         }
-        // Add the location to the database
-        return locationDAO.addLocation(location);
+
+        return locationDAO.addLocation(location); // Delegate insertion to DAO
     }
 }

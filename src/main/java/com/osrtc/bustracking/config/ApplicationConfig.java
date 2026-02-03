@@ -1,20 +1,36 @@
-// Package declaration – groups this class under the config package
+// Package declaration: configuration classes
 package com.osrtc.bustracking.config;
 
-// Import Jersey's ResourceConfig class used to configure REST resources
+// Jersey ResourceConfig: allows configuration of JAX-RS application
 import org.glassfish.jersey.server.ResourceConfig;
 
-// Import annotation to define the base URI for REST APIs
+// JAX-RS annotation to define base URI for all REST endpoints
 import javax.ws.rs.ApplicationPath;
 
-// Defines the base path for all REST endpoints (e.g., /api/endpoint)
-@ApplicationPath("/api")
+// Java Logging API
+import java.util.logging.Logger; // ✅ ADDED
+
+/**
+ * ApplicationConfig
+ * -------------------------
+ * Configures the Jersey REST application.
+ * Sets the base API path and registers controller packages.
+ */
+@ApplicationPath("/api") // All REST endpoints will be prefixed with /api
 public class ApplicationConfig extends ResourceConfig {
 
-    // Constructor is called when the application starts
-    public ApplicationConfig() {
+    // Logger instance for configuration messages
+    private static final Logger logger = Logger.getLogger(ApplicationConfig.class.getName());
 
-        // Tells Jersey to scan this package for REST controllers (@Path classes)
+    /**
+     * Constructor
+     * Registers controller package and logs initialization
+     */
+    public ApplicationConfig() {
+        // Scan this package for all REST controllers (e.g., BusController, AdminController)
         packages("com.osrtc.bustracking.controller");
+
+        // Log that configuration is complete
+        logger.info("ApplicationConfig initialized – REST API base path: /api");
     }
 }

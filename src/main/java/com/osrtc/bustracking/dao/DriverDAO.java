@@ -1,29 +1,37 @@
 package com.osrtc.bustracking.dao;
+// Package declaration for DAO classes related to bus tracking.
 
 import com.osrtc.bustracking.model.Driver;
+// Import Driver model class.
+
 import com.osrtc.bustracking.util.DBConnection;
+// Import utility class for getting database connections.
 
 import java.sql.*;
+// Import JDBC classes for database operations.
+
 import java.util.*;
+// Import utility classes like List, ArrayList.
 
-import javax.ws.rs.core.Response;
+import java.util.logging.Logger;
+// Import Java logger for logging info, warnings, and errors.
 
-/**
- * Data Access Object for Driver entities.
- * Handles CRUD operations, batch operations, and status updates for the "driver" table.
- */
 public class DriverDAO {
+    // DAO class to perform CRUD operations on Driver entity.
 
-    /**
-     * Retrieve all drivers from the database.
-     * @return List of Driver objects
-     */
+    private static final Logger logger = Logger.getLogger(DriverDAO.class.getName());
+    // Logger instance for this class.
+
     public List<Driver> getAllDrivers() {
+        logger.info("DriverDAO.getAllDrivers() called");
         List<Driver> list = new ArrayList<>();
         String sql = "SELECT * FROM driver";
+        // SQL query to fetch all drivers.
+
         try (Connection conn = DBConnection.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
+            // Open DB connection and execute query.
 
             while (rs.next()) {
                 Driver d = new Driver();
@@ -32,26 +40,29 @@ public class DriverDAO {
                 d.setPhone(rs.getString("phone"));
                 d.setLicenseNumber(rs.getString("license_number"));
                 list.add(d);
+                // Map each row to Driver object and add to list.
             }
+            logger.info("Total drivers fetched: " + list.size());
 
         } catch (Exception e) {
+            logger.severe("Error in getAllDrivers(): " + e.getMessage());
             e.printStackTrace();
         }
-        return list;
+        return list; // Return list of all drivers.
     }
 
-    /**
-     * Retrieve a driver by ID.
-     * @param id Driver ID
-     * @return Driver object or null if not found
-     */
     public Driver getDriverById(int id) {
+        logger.info("DriverDAO.getDriverById() called with id=" + id);
         Driver d = null;
         String sql = "SELECT * FROM driver WHERE driver_id=?";
+        // SQL query to fetch a driver by ID.
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
+            // Set ID parameter in query.
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     d = new Driver();
@@ -59,65 +70,62 @@ public class DriverDAO {
                     d.setDriverName(rs.getString("driver_name"));
                     d.setPhone(rs.getString("phone"));
                     d.setLicenseNumber(rs.getString("license_number"));
+                    logger.info("Driver found: ID=" + id);
+                } else {
+                    logger.warning("Driver not found: ID=" + id);
                 }
             }
 
         } catch (Exception e) {
+            logger.severe("Error in getDriverById(): " + e.getMessage());
             e.printStackTrace();
         }
-        return d;
+        return d; // Return Driver object or null if not found.
     }
 
-    /**
-     * Insert a new driver into the database.
-     * @param d Driver object
-     * @return true if insertion succeeded
-     */
     public boolean addDriver(Driver d) {
-
-        System.out.println("Driver received: " + d.getDriverName());
-
+        logger.info("DriverDAO.addDriver() called for: " + d.getDriverName());
         String sql = "INSERT INTO driver(driver_name, phone, license_number) VALUES(?,?,?)";
+        // SQL insert statement.
 
         try (Connection conn = DBConnection.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
             ps.setString(1, d.getDriverName());
             ps.setString(2, d.getPhone());
             ps.setString(3, d.getLicenseNumber());
+            // Set values for insert.
 
             int affected = ps.executeUpdate();
-
-            System.out.println("Rows affected: " + affected);
+            logger.info("Rows affected: " + affected);
 
             if (affected > 0) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
                     if (keys.next()) {
                         d.setDriverId(keys.getInt(1));
+                        logger.info("Driver added successfully with ID: " + d.getDriverId());
                     }
                 }
                 return true;
+            } else {
+                logger.warning("Failed to add driver: " + d.getDriverName());
             }
 
         } catch (SQLException e) {
-            // 🔥 THIS is what you were missing
-            System.err.println("SQL ERROR: " + e.getMessage());
+            logger.severe("SQL ERROR in addDriver(): " + e.getMessage());
             e.printStackTrace();
         } catch (Exception e) {
+            logger.severe("Error in addDriver(): " + e.getMessage());
             e.printStackTrace();
         }
 
-        return false;
+        return false; // Return false if insert fails.
     }
 
-
-    /**
-     * Insert multiple drivers in batch.
-     * @param drivers List of Driver objects
-     * @return true if all inserts succeeded
-     */
     public boolean addMultipleDrivers(List<Driver> drivers) {
+        logger.info("DriverDAO.addMultipleDrivers() called for " + drivers.size() + " drivers");
         String sql = "INSERT INTO driver(driver_name, phone, license_number) VALUES(?,?,?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -126,30 +134,30 @@ public class DriverDAO {
                 ps.setString(2, d.getPhone());
                 ps.setString(3, d.getLicenseNumber());
                 ps.addBatch();
+                // Add each driver to batch insert.
             }
 
             int[] results = ps.executeBatch();
             for (int res : results) {
                 if (res == PreparedStatement.EXECUTE_FAILED) {
-                    return false; // if any insert fails
+                    logger.warning("One of the driver inserts failed");
+                    return false;
                 }
             }
-
+            logger.info("All drivers inserted successfully");
             return true;
 
         } catch (Exception e) {
+            logger.severe("Error in addMultipleDrivers(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
-    /**
-     * Update a driver's details.
-     * @param d Driver object with updated info
-     * @return true if update succeeded
-     */
     public boolean updateDriver(Driver d) {
+        logger.info("DriverDAO.updateDriver() called for ID=" + d.getDriverId());
         String sql = "UPDATE driver SET driver_name=?, phone=?, license_number=? WHERE driver_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -158,22 +166,26 @@ public class DriverDAO {
             ps.setString(3, d.getLicenseNumber());
             ps.setInt(4, d.getDriverId());
 
-            return ps.executeUpdate() > 0;
+            boolean updated = ps.executeUpdate() > 0;
+            if (updated) {
+                logger.info("Driver updated successfully: ID=" + d.getDriverId());
+            } else {
+                logger.warning("Driver not found for update: ID=" + d.getDriverId());
+            }
+            return updated;
 
         } catch (Exception e) {
+            logger.severe("Error in updateDriver(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
-    /**
-     * Bulk update multiple drivers.
-     * @param drivers List of Driver objects
-     * @return List of successfully updated drivers
-     */
     public List<Driver> bulkUpdateDrivers(List<Driver> drivers) {
+        logger.info("DriverDAO.bulkUpdateDrivers() called for " + drivers.size() + " drivers");
         List<Driver> updatedDrivers = new ArrayList<>();
         String sql = "UPDATE driver SET driver_name=?, phone=?, license_number=? WHERE driver_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -187,51 +199,61 @@ public class DriverDAO {
                 if (affected > 0) {
                     updatedDrivers.add(d);
                 } else {
-                    throw new Exception("Failed to update driver with ID " + d.getDriverId());
+                    logger.warning("Failed to update driver: ID=" + d.getDriverId());
                 }
             }
 
         } catch (Exception e) {
+            logger.severe("Error in bulkUpdateDrivers(): " + e.getMessage());
             e.printStackTrace();
         }
+        logger.info("Total drivers updated successfully: " + updatedDrivers.size());
         return updatedDrivers;
     }
 
-    /**
-     * Update a driver's status.
-     * @param d Driver object with status
-     * @return true if update succeeded
-     */
     public boolean updateDriverStatus(Driver d) {
+        logger.info("DriverDAO.updateDriverStatus() called for ID=" + d.getDriverId() + ", status=" + d.getStatus());
         String sql = "UPDATE driver SET status=? WHERE driver_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setString(1, d.getStatus());
             ps.setInt(2, d.getDriverId());
 
-            return ps.executeUpdate() > 0;
+            boolean updated = ps.executeUpdate() > 0;
+            if (updated) {
+                logger.info("Driver status updated successfully: ID=" + d.getDriverId());
+            } else {
+                logger.warning("Driver not found for status update: ID=" + d.getDriverId());
+            }
+            return updated;
 
         } catch (Exception e) {
+            logger.severe("Error in updateDriverStatus(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;
     }
 
-    /**
-     * Delete a driver by ID.
-     * @param id Driver ID
-     * @return true if deletion succeeded
-     */
     public boolean deleteDriver(int id) {
+        logger.info("DriverDAO.deleteDriver() called for ID=" + id);
         String sql = "DELETE FROM driver WHERE driver_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            boolean deleted = ps.executeUpdate() > 0;
+            if (deleted) {
+                logger.info("Driver deleted successfully: ID=" + id);
+            } else {
+                logger.warning("Driver not found for deletion: ID=" + id);
+            }
+            return deleted;
 
         } catch (Exception e) {
+            logger.severe("Error in deleteDriver(): " + e.getMessage());
             e.printStackTrace();
         }
         return false;

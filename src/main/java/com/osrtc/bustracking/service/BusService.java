@@ -1,10 +1,16 @@
-package com.osrtc.bustracking.service;
+package com.osrtc.bustracking.service; 
+// Declares that this class is part of the service layer of the Bus Tracking application
 
-import com.osrtc.bustracking.dao.*;
-import com.osrtc.bustracking.model.*;
+import com.osrtc.bustracking.dao.*; 
+// Imports all DAO (Data Access Object) classes for database operations
+
+import com.osrtc.bustracking.model.*; 
+// Imports all model classes representing entities like Bus, Driver, Route
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger; 
+// Imports standard utilities for lists and logging
 
 /**
  * Service layer for Bus operations.
@@ -12,89 +18,79 @@ import java.util.List;
  */
 public class BusService {
 
-    // DAO instances to interact with the database for Bus, Route, and Driver
+    private static final Logger logger = Logger.getLogger(BusService.class.getName());
+    // Logger to track events, warnings, and info messages for debugging
+
+    // DAO instances to interact with database
     private BusDAO busDAO = new BusDAO();
     private RouteDAO routeDAO = new RouteDAO();
     private DriverDAO driverDAO = new DriverDAO();
-    BusDAO dao = new BusDAO(); // Seems redundant, could remove
+    BusDAO dao = new BusDAO(); // redundant duplicate, but kept as in original code
 
-    /**
-     * Retrieve all buses from the database.
-     * @return List of Bus objects
-     */
+    // Retrieve all buses from database
     public List<Bus> getAllBuses() {
+        logger.info("Fetching all buses");
         return busDAO.getAllBuses();
     }
 
-    /**
-     * Retrieve a specific Bus by its ID.
-     * @param id Bus ID
-     * @return Bus object if found
-     */
+    // Retrieve a specific bus by its ID
     public Bus getBusById(int id) {
+        logger.info("Fetching bus by ID: " + id);
         return busDAO.getBusById(id);
     }
 
-    /**
-     * Add a new Bus to the system.
-     * Performs validations:
-     *  - Bus number must not be null
-     *  - Route ID and Driver ID must be valid
-     *  - Prevent duplicate bus numbers
-     * @param bus Bus object to add
-     * @return true if added successfully
-     * @throws IllegalArgumentException if validation fails
-     */
+    // Add a new bus with validations
     public boolean addBus(Bus bus) {
-        // Basic null/invalid checks
+        logger.info("Adding new bus: " + bus.getBusNumber());
+
+        // Validate required fields
         if(bus.getBusNumber() == null || bus.getRouteId() <= 0 || bus.getDriverId() <= 0) {
+            logger.warning("Invalid bus data: " + bus);
             throw new IllegalArgumentException("Bus Number, Route, and Driver are required.");
         }
-        // Check if Route exists
+
+        // Check if route exists
         if(routeDAO.getRouteById(bus.getRouteId()) == null) {
+            logger.warning("Route does not exist: " + bus.getRouteId());
             throw new IllegalArgumentException("Route does not exist.");
         }
-        // Check if Driver exists
+
+        // Check if driver exists
         if(driverDAO.getDriverById(bus.getDriverId()) == null) {
+            logger.warning("Driver does not exist: " + bus.getDriverId());
             throw new IllegalArgumentException("Driver does not exist.");
         }
+
         // Prevent duplicate bus numbers
         for(Bus b : busDAO.getAllBuses()) {
             if(b.getBusNumber().equalsIgnoreCase(bus.getBusNumber())) {
+                logger.warning("Duplicate bus number: " + bus.getBusNumber());
                 throw new IllegalArgumentException("Bus with same number already exists.");
             }
         }
-        return busDAO.addBus(bus);
+
+        return busDAO.addBus(bus); // Delegate insertion to DAO
     }
 
-    /**
-     * Bulk insert multiple buses.
-     * Each bus is validated before insertion.
-     * Returns a list of messages indicating success/failure for each bus.
-     * @param buses List of Bus objects to add
-     * @return List of status messages
-     */
+    // Add multiple buses in bulk and return individual responses
     public List<String> multipleBusInsert(List<Bus> buses) {
+        logger.info("Bulk inserting " + buses.size() + " buses");
         List<String> responses = new ArrayList<>();
-
         for (Bus bus : buses) {
             try {
-                validateBus(bus); // Check bus validity
-                busDAO.addBus(bus);
+                validateBus(bus); // Validate each bus
+                busDAO.addBus(bus); // Add bus to database
+                logger.info("Bus added successfully: " + bus.getBusNumber());
                 responses.add("Bus Added: " + bus.getBusNumber());
             } catch (Exception e) {
+                logger.warning("Failed to add bus " + bus.getBusNumber() + ": " + e.getMessage());
                 responses.add("Failed: " + bus.getBusNumber() + " | Reason: " + e.getMessage());
             }
         }
-
         return responses;
     }
 
-    /**
-     * Validates a single Bus object.
-     * Checks that bus number is present and route/driver exist.
-     * @param bus Bus to validate
-     */
+    // Validate a bus object before adding/updating
     private void validateBus(Bus bus) {
         if (bus.getBusNumber() == null || bus.getBusNumber().isEmpty())
             throw new IllegalArgumentException("Bus Number required");
@@ -106,104 +102,83 @@ public class BusService {
             throw new IllegalArgumentException("Invalid driver: " + bus.getDriverId());
     }
 
-    /**
-     * Update an existing bus.
-     * Throws exception if bus does not exist.
-     * @param bus Bus object with updated details
-     * @return true if update successful
-     */
+    // Update an existing bus
     public boolean updateBus(Bus bus) {
-        if(busDAO.getBusById(bus.getBusId()) == null) {
+        logger.info("Updating bus ID: " + bus.getBusId());
+        if(busDAO.getBusById(bus.getBusId()) == null) { // Check if bus exists
+            logger.warning("Bus not found for update: " + bus.getBusId());
             throw new IllegalArgumentException("Bus not found.");
         }
-        return busDAO.updateBus(bus);
+        return busDAO.updateBus(bus); // Delegate update to DAO
     }
 
-    /**
-     * Bulk update multiple buses.
-     * Throws exception if any bus ID is invalid.
-     * @param buses List of buses to update
-     * @return List of updated Bus objects
-     * @throws Exception if any bus ID does not exist
-     */
+    // Bulk update buses
     public List<Bus> bulkUpdateBuses(List<Bus> buses) throws Exception {
+        logger.info("Bulk updating " + buses.size() + " buses");
         List<Bus> updated = new ArrayList<>();
-        
         for (Bus b : buses) {
             Bus existing = busDAO.getBusById(b.getBusId());
             if (existing == null) {
+                logger.warning("Bus ID not found for bulk update: " + b.getBusId());
                 throw new Exception("Bus ID not found: " + b.getBusId());
             }
-            busDAO.updateBus(b);
+            busDAO.updateBus(b); // Update each bus
             updated.add(b);
         }
         return updated;
     }
 
-    /**
-     * Delete a single bus by ID.
-     * @param busId Bus ID
-     * @return true if deleted successfully
-     */
+    // Delete a bus by ID
     public boolean deleteBus(int busId) {
-        if(busDAO.getBusById(busId) == null) {
+        logger.info("Deleting bus ID: " + busId);
+        if(busDAO.getBusById(busId) == null) { // Ensure bus exists
+            logger.warning("Bus not found for deletion: " + busId);
             throw new IllegalArgumentException("Bus not found.");
         }
         return busDAO.deleteBus(busId);
     }
 
-    /**
-     * Bulk delete multiple buses.
-     * @param busIds List of bus IDs to delete
-     * @return List of deleted Bus objects
-     * @throws Exception if any bus ID does not exist
-     */
+    // Bulk delete buses
     public List<Bus> bulkDeleteBuses(List<Integer> busIds) throws Exception {
+        logger.info("Bulk deleting " + busIds.size() + " buses");
         List<Bus> deleted = new ArrayList<>();
-        
         for (Integer id : busIds) {
             Bus existing = busDAO.getBusById(id);
             if (existing == null) {
+                logger.warning("Bus ID not found for bulk deletion: " + id);
                 throw new Exception("Bus ID not found: " + id);
             }
-            busDAO.deleteBus(id);
-            deleted.add(existing);
+            busDAO.deleteBus(id); // Delete bus
+            deleted.add(existing); // Keep record of deleted bus
         }
         return deleted;
     }
 
-    /**
-     * Assign a driver to a bus.
-     * Checks that both bus and driver exist.
-     * @param busId Bus ID
-     * @param driverId Driver ID
-     * @return true if assignment successful
-     */
+    // Assign a driver to a bus
     public boolean assignDriverToBus(int busId, int driverId) {
+        logger.info("Assigning driver ID " + driverId + " to bus ID " + busId);
         Bus bus = busDAO.getBusById(busId);
         if (bus == null) {
+            logger.warning("Bus not found: " + busId);
             throw new IllegalArgumentException("Bus not found.");
         }
         if (driverDAO.getDriverById(driverId) == null) {
+            logger.warning("Driver not found: " + driverId);
             throw new IllegalArgumentException("Driver not found.");
         }
-        bus.setDriverId(driverId);
+        bus.setDriverId(driverId); // Update driver assignment
         return busDAO.updateBus(bus);
     }
 
-    /**
-     * Update the status of a bus (e.g., Active, Inactive).
-     * @param busId Bus ID
-     * @param status New status
-     * @return true if update successful
-     */
+    // Update the operational status of a bus
     public boolean updateBusStatus(int busId, String status) {
+        logger.info("Updating status of bus ID " + busId + " to " + status);
         Bus bus = busDAO.getBusById(busId);
         if (bus == null) {
+            logger.warning("Bus not found for status update: " + busId);
             throw new IllegalArgumentException("Bus not found.");
         }
-        bus.setStatus(status);
+        bus.setStatus(status); // Set new status
         return busDAO.updateBus(bus);
     }
-
 }

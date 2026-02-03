@@ -1,11 +1,14 @@
 package com.osrtc.bustracking.model;
 
+import java.util.logging.Logger;
+
 /**
  * Aggregates all related entities for a bus in the OSRTC Bus Tracking System.
- * This model is used for operations that require handling multiple linked entities together.
  * Contains Bus, Route, Driver, Location, and Admin information.
  */
 public class FullBusData {
+
+    private static final Logger logger = Logger.getLogger(FullBusData.class.getName());
 
     /** The bus entity */
     private Bus bus;
@@ -22,83 +25,63 @@ public class FullBusData {
     /** The admin responsible for managing this bus */
     private Admin admin;
 
-    /**
-     * Gets the bus entity.
-     * @return bus
-     */
-    public Bus getBus() { 
-        return bus; 
+    /** Gets the bus entity. */
+    public Bus getBus() {
+        logger.info("Getting Bus entity: " + bus);
+        return bus;
     }
 
-    /**
-     * Sets the bus entity.
-     * @param bus the Bus object to set
-     */
-    public void setBus(Bus bus) { 
-        this.bus = bus; 
+    /** Sets the bus entity. */
+    public void setBus(Bus bus) {
+        logger.info("Setting Bus entity: " + bus);
+        this.bus = bus;
     }
 
-    /**
-     * Gets the route entity.
-     * @return route
-     */
-    public Route getRoute() { 
-        return route; 
+    /** Gets the route entity. */
+    public Route getRoute() {
+        logger.info("Getting Route entity: " + route);
+        return route;
     }
 
-    /**
-     * Sets the route entity.
-     * @param route the Route object to set
-     */
-    public void setRoute(Route route) { 
-        this.route = route; 
+    /** Sets the route entity. */
+    public void setRoute(Route route) {
+        logger.info("Setting Route entity: " + route);
+        this.route = route;
     }
 
-    /**
-     * Gets the driver entity.
-     * @return driver
-     */
-    public Driver getDriver() { 
-        return driver; 
+    /** Gets the driver entity. */
+    public Driver getDriver() {
+        logger.info("Getting Driver entity: " + driver);
+        return driver;
     }
 
-    /**
-     * Sets the driver entity.
-     * @param driver the Driver object to set
-     */
-    public void setDriver(Driver driver) { 
-        this.driver = driver; 
+    /** Sets the driver entity. */
+    public void setDriver(Driver driver) {
+        logger.info("Setting Driver entity: " + driver);
+        this.driver = driver;
     }
 
-    /**
-     * Gets the location entity.
-     * @return location
-     */
-    public Location getLocation() { 
-        return location; 
+    /** Gets the location entity. */
+    public Location getLocation() {
+        logger.info("Getting Location entity: " + location);
+        return location;
     }
 
-    /**
-     * Sets the location entity.
-     * @param location the Location object to set
-     */
-    public void setLocation(Location location) { 
-        this.location = location; 
+    /** Sets the location entity. */
+    public void setLocation(Location location) {
+        logger.info("Setting Location entity: " + location);
+        this.location = location;
     }
 
-    /**
-     * Gets the admin entity.
-     * @return admin
-     */
-    public Admin getAdmin() { 
-        return admin; 
+    /** Gets the admin entity. */
+    public Admin getAdmin() {
+        logger.info("Getting Admin entity: " + admin);
+        return admin;
     }
 
-    /**
-     * Sets the admin entity.
-     * @param admin the Admin object to set
-     */
-    public void setAdmin(Admin admin) { 
-        this.admin = admin; 
+    /** Sets the admin entity. */
+    public void setAdmin(Admin admin) {
+        logger.info("Setting Admin entity: " + admin);
+        this.admin = admin;
     }
 }

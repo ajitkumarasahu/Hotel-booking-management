@@ -1,103 +1,91 @@
 package com.osrtc.bustracking.service;
+// Package declaration – this class is part of the service layer.
 
 import com.osrtc.bustracking.dao.AdminDAO;
+// Imports the DAO class that interacts with the database for Admin entities.
+
 import com.osrtc.bustracking.model.Admin;
+// Imports the Admin model class.
+
 import java.util.List;
+// Imports List for returning multiple Admins.
+
+import java.util.logging.Logger;
+// Imports Logger for logging messages.
 
 /**
  * Service layer for Admin operations.
- * Acts as an intermediary between controllers and the DAO,
- * providing validation and business logic before database access.
+ * Handles business logic and validation before interacting with AdminDAO.
  */
 public class AdminService {
 
-    // Instantiate AdminDAO to interact with the database for Admin entities
-    private AdminDAO adminDAO = new AdminDAO();
+    private final AdminDAO adminDAO = new AdminDAO();
+    // Instantiates DAO for database operations.
 
-    /**
-     * Retrieve all admins from the database.
-     * @return List of Admin objects
-     */
+    private static final Logger logger = Logger.getLogger(AdminService.class.getName());
+    // Logger instance for this class.
+
     public List<Admin> getAllAdmins() {
-        // Delegate the call to the DAO layer
+        logger.info("Fetching all admins");
         return adminDAO.getAllAdmins();
+        // Retrieves all admins from the database via DAO.
     }
 
-    /**
-     * Retrieve a specific Admin by its ID.
-     * @param id the ID of the admin
-     * @return Admin object if found, null otherwise
-     */
     public Admin getAdminById(int id) {
-        // Fetch admin from DAO using the given ID
-        return adminDAO.getAdminById(id);
+        Admin admin = adminDAO.getAdminById(id);
+        // Fetch admin by ID.
+
+        if (admin == null) {
+            logger.warning("Admin not found: id=" + id);
+            throw new IllegalArgumentException("Admin not found.");
+            // Throws exception if admin does not exist.
+        }
+        return admin;
     }
 
-    /**
-     * Add a new Admin to the database.
-     * Performs basic validation before calling the DAO.
-     * @param admin Admin object to add
-     * @return true if addition was successful
-     * @throws IllegalArgumentException if username or password is missing
-     */
     public boolean addAdmin(Admin admin) {
-        // Validate that username and password are provided
-        if(admin.getUsername() == null || admin.getPassword() == null) {
+        if (admin.getUsername() == null || admin.getPassword() == null) {
             throw new IllegalArgumentException("Username and Password are required.");
+            // Validates that username and password are provided.
         }
-        // Delegate to DAO to insert admin into the database
+        logger.info("Adding new admin: " + admin.getUsername());
         return adminDAO.addAdmin(admin);
+        // Delegates to DAO to insert the admin into the database.
     }
 
-    /**
-     * Update an existing Admin in the database.
-     * Checks if the admin exists before updating.
-     * @param admin Admin object with updated information
-     * @return true if update was successful
-     * @throws IllegalArgumentException if admin does not exist
-     */
     public boolean updateAdmin(Admin admin) {
-        // Check if admin exists in the database
-        if(adminDAO.getAdminById(admin.getAdminId()) == null) {
+        if (adminDAO.getAdminById(admin.getAdminId()) == null) {
+            logger.warning("Cannot update. Admin not found: id=" + admin.getAdminId());
             throw new IllegalArgumentException("Admin not found.");
+            // Checks if the admin exists before updating.
         }
-        // Delegate to DAO to perform the update
+        logger.info("Updating admin: id=" + admin.getAdminId());
         return adminDAO.updateAdmin(admin);
+        // Delegates update operation to DAO.
     }
 
-    /**
-     * Delete an Admin from the database by its ID.
-     * Checks if the admin exists before deletion.
-     * @param adminId ID of the admin to delete
-     * @return true if deletion was successful
-     * @throws IllegalArgumentException if admin does not exist
-     */
     public boolean deleteAdmin(int adminId) {
-        // Verify admin exists before deletion
-        if(adminDAO.getAdminById(adminId) == null) {
+        if (adminDAO.getAdminById(adminId) == null) {
+            logger.warning("Cannot delete. Admin not found: id=" + adminId);
             throw new IllegalArgumentException("Admin not found.");
+            // Validates existence before deletion.
         }
-        // Delegate to DAO to delete admin
+        logger.info("Deleting admin: id=" + adminId);
         return adminDAO.deleteAdmin(adminId);
+        // Deletes admin through DAO.
     }
 
-    /**
-     * Authenticate an Admin using username and password.
-     * @param username username of the admin
-     * @param password password of the admin
-     * @return Admin object if authentication succeeds
-     * @throws IllegalArgumentException if credentials are invalid
-     */
     public Admin login(String username, String password) {
-        // Retrieve admin by username
         Admin admin = adminDAO.getAdminByUsername(username);
+        // Fetch admin record by username.
 
-        // Check if password matches
-        if(admin != null && admin.getPassword().equals(password)) {
-            return admin; // Authentication successful
+        if (admin != null && admin.getPassword().equals(password)) {
+            logger.info("Admin login successful: " + username);
+            return admin;
+            // Successful login if password matches.
         }
-
-        // Throw exception if username or password is incorrect
+        logger.warning("Invalid login attempt for username: " + username);
         throw new IllegalArgumentException("Invalid username or password.");
+        // Throws exception for invalid login.
     }
 }

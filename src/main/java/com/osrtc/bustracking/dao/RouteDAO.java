@@ -1,10 +1,20 @@
 package com.osrtc.bustracking.dao;
+// Package declaration – this class is part of DAO layer for bus tracking.
 
 import com.osrtc.bustracking.model.Route;
+// Import Route model class.
+
 import com.osrtc.bustracking.util.DBConnection;
+// Import utility class for database connections.
 
 import java.sql.*;
+// Import JDBC classes: Connection, PreparedStatement, ResultSet, Statement.
+
 import java.util.*;
+// Import Java utility classes: List, ArrayList.
+
+import java.util.logging.Logger;
+// Import Java Logger for logging messages.
 
 /**
  * Data Access Object for Route entities.
@@ -12,13 +22,15 @@ import java.util.*;
  */
 public class RouteDAO {
 
-    /**
-     * Retrieve all routes from the database.
-     * @return List of Route objects
-     */
+    private static final Logger logger = Logger.getLogger(RouteDAO.class.getName());
+    // Logger instance for this class.
+
     public List<Route> getAllRoutes() {
+        logger.info("RouteDAO.getAllRoutes() called");
         List<Route> list = new ArrayList<>();
         String sql = "SELECT * FROM route";
+        // SQL query to fetch all routes.
+
         try (Connection conn = DBConnection.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
@@ -31,26 +43,29 @@ public class RouteDAO {
                 r.setTotalDistanceKm(rs.getDouble("total_distance_km"));
                 r.setEstimatedTime(rs.getString("estimated_time"));
                 list.add(r);
+                // Map each row to Route object and add to list.
             }
+            logger.info("Total routes fetched: " + list.size());
 
         } catch (Exception e) {
+            logger.severe("Error in getAllRoutes(): " + e.getMessage());
             e.printStackTrace();
         }
-        return list;
+
+        return list; // Return all routes.
     }
 
-    /**
-     * Retrieve a route by its ID.
-     * @param id Route ID
-     * @return Route object or null if not found
-     */
     public Route getRouteById(int id) {
+        logger.info("RouteDAO.getRouteById() called for routeId=" + id);
         Route r = null;
         String sql = "SELECT * FROM route WHERE route_id=?";
+        // SQL query to fetch a route by ID.
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
+
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     r = new Route();
@@ -59,22 +74,24 @@ public class RouteDAO {
                     r.setEndPoint(rs.getString("end_point"));
                     r.setTotalDistanceKm(rs.getDouble("total_distance_km"));
                     r.setEstimatedTime(rs.getString("estimated_time"));
+                    logger.info("Route found: routeId=" + id);
+                } else {
+                    logger.warning("No route found for routeId=" + id);
                 }
             }
 
         } catch (Exception e) {
+            logger.severe("Error in getRouteById(): " + e.getMessage());
             e.printStackTrace();
         }
-        return r;
+
+        return r; // Return Route or null if not found.
     }
 
-    /**
-     * Insert a single route into the database.
-     * @param r Route object
-     * @return true if insertion succeeded
-     */
     public boolean addRoute(Route r) {
+        logger.info("RouteDAO.addRoute() called: " + r.getStartPoint() + " -> " + r.getEndPoint());
         String sql = "INSERT INTO route(start_point, end_point, total_distance_km, estimated_time) VALUES(?,?,?,?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -84,29 +101,30 @@ public class RouteDAO {
             ps.setString(4, r.getEstimatedTime());
 
             int affected = ps.executeUpdate();
+            logger.info("Rows affected: " + affected);
 
-            // Retrieve generated route ID
             if (affected > 0) {
                 try (ResultSet keys = ps.getGeneratedKeys()) {
-                    if (keys.next()) r.setRouteId(keys.getInt(1));
+                    if (keys.next()) {
+                        r.setRouteId(keys.getInt(1));
+                        logger.info("Route added successfully with ID=" + r.getRouteId());
+                    }
                 }
+                return true;
             }
 
-            return affected > 0;
-
         } catch (Exception e) {
+            logger.severe("Error in addRoute(): " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 
-    /**
-     * Insert multiple routes in batch.
-     * @param routes List of Route objects
-     * @return true if all inserts succeeded
-     */
     public boolean addMultipleRoutes(List<Route> routes) {
+        logger.info("RouteDAO.addMultipleRoutes() called for " + routes.size() + " routes");
         String sql = "INSERT INTO route(start_point, end_point, total_distance_km, estimated_time) VALUES(?,?,?,?)";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -116,28 +134,31 @@ public class RouteDAO {
                 ps.setDouble(3, r.getTotalDistanceKm());
                 ps.setString(4, r.getEstimatedTime());
                 ps.addBatch();
+                // Add each route to batch insert.
             }
 
             int[] results = ps.executeBatch();
             for (int res : results) {
-                if (res == Statement.EXECUTE_FAILED) return false; // If any insert failed
+                if (res == Statement.EXECUTE_FAILED) {
+                    logger.warning("One of the routes failed to insert");
+                    return false;
+                }
             }
-
+            logger.info("All routes inserted successfully");
             return true;
 
         } catch (Exception e) {
+            logger.severe("Error in addMultipleRoutes(): " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 
-    /**
-     * Update a route by its ID.
-     * @param r Route object with updated data
-     * @return true if update succeeded
-     */
     public boolean updateRoute(Route r) {
+        logger.info("RouteDAO.updateRoute() called for routeId=" + r.getRouteId());
         String sql = "UPDATE route SET start_point=?, end_point=?, total_distance_km=?, estimated_time=? WHERE route_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -147,22 +168,26 @@ public class RouteDAO {
             ps.setString(4, r.getEstimatedTime());
             ps.setInt(5, r.getRouteId());
 
-            return ps.executeUpdate() > 0;
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                logger.info("Route updated successfully: routeId=" + r.getRouteId());
+                return true;
+            } else {
+                logger.warning("Route update failed: routeId=" + r.getRouteId());
+            }
 
         } catch (Exception e) {
+            logger.severe("Error in updateRoute(): " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 
-    /**
-     * Update multiple routes in batch.
-     * @param routes List of Route objects to update
-     * @return List of Route objects that failed to update
-     */
     public List<Route> bulkUpdateRoutes(List<Route> routes) {
+        logger.info("RouteDAO.bulkUpdateRoutes() called for " + routes.size() + " routes");
         List<Route> failedUpdates = new ArrayList<>();
-        String sql = "UPDATE route SET start_point=?, end_point=?, total_distance_km=?, estimated_time=? WHERE route_id?";
+        String sql = "UPDATE route SET start_point=?, end_point=?, total_distance_km=?, estimated_time=? WHERE route_id=?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -175,42 +200,48 @@ public class RouteDAO {
                 ps.setInt(5, r.getRouteId());
 
                 int affected = ps.executeUpdate();
-                if (affected == 0) failedUpdates.add(r); // Track failed updates
+                if (affected == 0) {
+                    logger.warning("Failed to update routeId=" + r.getRouteId());
+                    failedUpdates.add(r);
+                }
             }
 
         } catch (Exception e) {
+            logger.severe("Error in bulkUpdateRoutes(): " + e.getMessage());
             e.printStackTrace();
         }
 
-        return failedUpdates;
+        return failedUpdates; // Return routes that failed to update.
     }
 
-    /**
-     * Delete a route by its ID.
-     * @param id Route ID
-     * @return true if deletion succeeded
-     */
     public boolean deleteRoute(int id) {
+        logger.info("RouteDAO.deleteRoute() called for routeId=" + id);
         String sql = "DELETE FROM route WHERE route_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
             ps.setInt(1, id);
-            return ps.executeUpdate() > 0;
+            int affected = ps.executeUpdate();
+            if (affected > 0) {
+                logger.info("Route deleted successfully: routeId=" + id);
+                return true;
+            } else {
+                logger.warning("No route found to delete: routeId=" + id);
+            }
 
         } catch (Exception e) {
+            logger.severe("Error in deleteRoute(): " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 
-    /**
-     * Delete multiple routes in batch.
-     * @param routeIds List of Route IDs
-     * @return true if all deletions succeeded
-     */
     public boolean deleteMultipleRoutes(List<Integer> routeIds) {
+        logger.info("RouteDAO.deleteMultipleRoutes() called for " + routeIds.size() + " routes");
         String sql = "DELETE FROM route WHERE route_id=?";
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -220,15 +251,20 @@ public class RouteDAO {
             }
 
             int[] results = ps.executeBatch();
-            for (int r : results) {
-                if (r == 0) return false; // If any deletion failed
+            for (int i = 0; i < results.length; i++) {
+                if (results[i] == 0) {
+                    logger.warning("Failed to delete routeId=" + routeIds.get(i));
+                    return false;
+                }
             }
-
+            logger.info("All routes deleted successfully");
             return true;
 
         } catch (Exception e) {
+            logger.severe("Error in deleteMultipleRoutes(): " + e.getMessage());
             e.printStackTrace();
         }
+
         return false;
     }
 }
