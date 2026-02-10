@@ -74,5 +74,4 @@ services:
 volumes:
   # Named volume for MySQL data storage
   mysql_data:
-   - ./logs:/usr/local/tomcat/logs
 
