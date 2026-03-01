@@ -1,116 +1,92 @@
-<!-- 
-    Maven Project Object Model (POM)
-    This file defines project metadata, dependencies, and build configuration
--->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0
-                             http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-    <!-- Maven POM model version -->
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Project coordinates (unique identification) -->
-    <groupId>com.osrtc.bustracking</groupId>
-    <artifactId>OSRTC-BusTrackingSystem</artifactId>
-    <version>1.0-SNAPSHOT</version>
-
-    <!-- WAR packaging for deployment on a servlet container -->
+    <groupId>com.hotelbookin</groupId>
+    <artifactId>HotelBookingManagementSystem</artifactId>
+    <version>1.0.0</version>
     <packaging>war</packaging>
+
+    <name>Hotel Booking Management System</name>
+
+    <properties>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+    </properties>
 
     <dependencies>
 
-        <!-- Servlet API: Provided by the application server (Tomcat, etc.) -->
+        <!-- Servlet API -->
         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>4.0.1</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
 
-        <!-- MySQL JDBC driver for database connectivity -->
+        <!-- JSP API -->
         <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>8.0.33</version>
+            <groupId>jakarta.servlet.jsp</groupId>
+            <artifactId>jakarta.servlet.jsp-api</artifactId>
+            <version>3.0.0</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- SLF4J logging API -->
+        <!-- JSTL -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>2.0.5</version>
+            <groupId>jakarta.servlet.jsp.jstl</groupId>
+            <artifactId>jakarta.servlet.jsp.jstl-api</artifactId>
+            <version>2.0.0</version>
         </dependency>
 
-        <!-- Simple SLF4J logging implementation -->
+        <!-- MySQL Connector -->
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>2.0.5</version>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>8.3.0</version>
         </dependency>
 
-        <!-- Jersey servlet container for RESTful web services -->
+        <!-- JUnit (Optional for Testing) -->
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.39</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
         </dependency>
 
-        <!-- Servlet container -->
         <dependency>
-            <groupId>org.glassfish.jersey.containers</groupId>
-            <artifactId>jersey-container-servlet</artifactId>
-            <version>2.34</version>
-        </dependency>
-
-        <!-- JSON support -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.34</version>
-        </dependency>
-
-        <!-- HK2 dependency injection support for Jersey -->
-        <dependency>
-            <groupId>org.glassfish.jersey.inject</groupId>
-            <artifactId>jersey-hk2</artifactId>
-            <version>2.39</version>
-        </dependency>
-
-        <!-- JSON serialization/deserialization using Jackson -->
-        <dependency>
-            <groupId>org.glassfish.jersey.media</groupId>
-            <artifactId>jersey-media-json-jackson</artifactId>
-            <version>2.39</version>
-        </dependency>
-
-        <!-- JAX-RS API (provided by the container at runtime) -->
-        <dependency>
-            <groupId>javax.ws.rs</groupId>
-            <artifactId>javax.ws.rs-api</artifactId>
-            <version>2.1.1</version>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>5.0.0</version>
             <scope>provided</scope>
         </dependency>
 
     </dependencies>
 
     <build>
-
-        <!-- Name of the generated WAR file -->
-        <finalName>OSRTC-BusTrackingSystem</finalName>
+        <finalName>HotelBookingManagementSystem</finalName>
 
         <plugins>
 
-            <!-- Maven Compiler Plugin for Java version configuration -->
+            <!-- Compiler Plugin -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.10.1</version>
+                <version>3.11.0</version>
                 <configuration>
-                    <!-- Java source and target compatibility -->
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
+            </plugin>
+
+            <!-- WAR Plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <version>3.3.2</version>
             </plugin>
 
         </plugins>
