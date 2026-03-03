@@ -5,7 +5,7 @@
          https://jakarta.ee/xml/ns/jakartaee/web-app_5_0.xsd"
          version="5.0">
 
-    <display-name>Hotel Booking Management System</display-name>
+    <display-name>Hotel-Booking-Management</display-name>
 
     <!-- Welcome File -->
     <welcome-file-list>

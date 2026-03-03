@@ -6,11 +6,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.hotel</groupId>
-    <artifactId>HotelBookingManagementSystem</artifactId>
+    <artifactId>Hotel-Booking-Management</artifactId>
     <version>1.0.0</version>
     <packaging>war</packaging>
 
-    <name>Hotel Booking Management System</name>
+    <name>Hotel-Booking-Management</name>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
@@ -104,7 +104,7 @@
     </dependencies>
 
     <build>
-        <finalName>HotelBookingManagementSystem</finalName>
+        <finalName>Hotel-Booking-Management</finalName>
 
         <plugins>
 
