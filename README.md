@@ -275,9 +275,7 @@ Request Body: <br>
   "status": "CONFIRMED"<br>
 }<br>
 ```
-
 ---
-
 ## 9. Key Features <br>
 
 * User Registration and Login <br>
@@ -325,5 +323,11 @@ This project is developed as a **Final Year Computer Science Project** to demons
 * Software Engineering Architecture <br>
 ---
 
-
+### 13.Author
+---
+👨‍💻 Developer
+AJIT KUMAR SAHU
+Email-sahuajitkumara@gmail.com
+Contact - 9861567673
+---
 
