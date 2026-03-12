@@ -48,8 +48,10 @@ public class AuthController extends HttpServlet {
             boolean success = userService.registerUser(user);
 
             if (success) {
+                response.setStatus(201); // Created
                 out.print("{\"message\":\"User registered successfully\"}");
             } else {
+                response.setStatus(400); // Bad Request
                 out.print("{\"message\":\"Registration failed\"}");
             }
         }
@@ -72,9 +74,11 @@ public class AuthController extends HttpServlet {
 
             if (user != null) {
                 String token = JWTUtil.generateToken(user.getEmail(), user.getRole());
+                response.setStatus(200); // OK
                 out.print("{\"token\":\"" + token + "\"}");
+                out.print("{\"message\":\"User login successfully\"}");
             } else {
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                response.setStatus(401); // Unauthorized
                 out.print("{\"message\":\"Invalid credentials\"}");
             }
         }
