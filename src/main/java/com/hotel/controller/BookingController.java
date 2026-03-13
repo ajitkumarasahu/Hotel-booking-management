@@ -39,6 +39,8 @@ public class BookingController extends HttpServlet {
             obj.put("totalPrice",b.getTotalPrice());
             obj.put("status",b.getStatus());
 
+            resp.setContentType("application/json");
+            resp.setStatus(200);
             resp.getWriter().print(obj);
 
         }else{
@@ -62,6 +64,8 @@ public class BookingController extends HttpServlet {
                 arr.put(obj);
             }
 
+            resp.setContentType("application/json");
+            resp.setStatus(200);
             resp.getWriter().print(arr);
         }
     }
@@ -87,7 +91,15 @@ public class BookingController extends HttpServlet {
 
         boolean result=bookingService.createBooking(booking);
 
-        resp.getWriter().print("{\"created\":"+result+"}");
+        if(result){
+            resp.setContentType("application/json");
+            resp.setStatus(201);
+            resp.getWriter().print("{\"message\":\"Room Booked successfully\"}");
+        } else {
+            resp.setContentType("application/json");
+            resp.setStatus(400);
+            resp.getWriter().print("{\"message\":\"Room Booked failed\"}");
+        }
     }
 
     protected void doPut(HttpServletRequest req,HttpServletResponse resp)throws IOException{
@@ -111,8 +123,15 @@ public class BookingController extends HttpServlet {
         booking.setStatus(obj.getString("status"));
 
         boolean result=bookingService.updateBooking(booking);
-
-        resp.getWriter().print("{\"updated\":"+result+"}");
+        if(result){
+            resp.setContentType("application/json");
+            resp.setStatus(200);
+            resp.getWriter().print("{\"message\":\"Room Upadated successfully\"}");
+        }else{
+            resp.setContentType("application/json");
+            resp.setStatus(400);
+            resp.getWriter().print("{\"message\":\"Room Upadated Failed\"}");
+        }
     }
 
     protected void doDelete(HttpServletRequest req,HttpServletResponse resp)throws IOException{
@@ -121,6 +140,14 @@ public class BookingController extends HttpServlet {
 
         boolean result=bookingService.deleteBooking(id);
 
-        resp.getWriter().print("{\"deleted\":"+result+"}");
+       if(result){
+            resp.setContentType("application/json");
+            resp.setStatus(200);
+            resp.getWriter().print("{\"message\":\"Room Delete successfully\"}");
+        }else{
+            resp.setContentType("application/json");
+            resp.setStatus(400);
+            resp.getWriter().print("{\"message\":\"Room Delete Failed\"}");
+        }
     }
 }

@@ -147,8 +147,11 @@ public class HotelController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         if(created){
+            response.setContentType("application/json");
+            response.setStatus(201);
             out.print("{\"message\":\"Hotel created successfully\"}");
         }else{
+            response.setContentType("application/json");
             response.setStatus(400);
             out.print("{\"message\":\"Hotel Creation failed\"}");
         }
@@ -178,8 +181,11 @@ public class HotelController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         if(updated){
+            response.setContentType("application/json");
+            response.setStatus(200);
             out.print("{\"message\":\"Hotel updated Successfully\"}");
         }else{
+            response.setContentType("application/json");
             response.setStatus(400);
             out.print("{\"message\":\"Hotel Update failed\"}");
         }
@@ -196,8 +202,11 @@ public class HotelController extends HttpServlet {
         PrintWriter out = response.getWriter();
 
         if(deleted){
+            response.setContentType("application/json");
+            response.setStatus(200);
             out.print("{\"message\":\"Hotel deleted Successfully\"}");
         }else{
+            response.setContentType("application/json");
             response.setStatus(400);
             out.print("{\"message\":\"Hotel Delete failed\"}");
         }

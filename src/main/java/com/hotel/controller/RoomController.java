@@ -78,6 +78,7 @@ public class RoomController extends HttpServlet {
         }
 
         resp.setContentType("application/json");
+        resp.setStatus(200);
         resp.getWriter().print(array);
     }
 
@@ -142,9 +143,12 @@ public class RoomController extends HttpServlet {
         boolean result = roomService.addRoom(room);
 
         if(result){
+            resp.setContentType("application/json");
             resp.setStatus(201);
             resp.getWriter().print("{\"created\":Room added successfully }");
         } else {
+            resp.setContentType("application/json");
+            resp.setStatus(400);
             resp.getWriter().print("{\"created\":Failed to add room }");  
         }
     }
@@ -174,9 +178,12 @@ public class RoomController extends HttpServlet {
         boolean result = roomService.updateRoom(room);
 
         if(result){
+            resp.setContentType("application/json");
             resp.setStatus(200);
             resp.getWriter().print("{\"updated\":Room updated successfully }");
         } else {
+            resp.setContentType("application/json");
+            resp.setStatus(400);
             resp.getWriter().print("{\"updated\":Failed to update room }");  
         }
     }
@@ -189,9 +196,12 @@ public class RoomController extends HttpServlet {
         boolean result = roomService.deleteRoom(id);
 
         if(result){
+            resp.setContentType("application/json");
             resp.setStatus(200);
             resp.getWriter().print("{\"deleted\":Room deleted successfully }");
         } else {
+            resp.setContentType("application/json");
+            resp.setStatus(400);
             resp.getWriter().print("{\"deleted\":Failed to delete room }");  
         }
     }

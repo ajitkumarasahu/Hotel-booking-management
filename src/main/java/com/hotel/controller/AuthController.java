@@ -48,9 +48,11 @@ public class AuthController extends HttpServlet {
             boolean success = userService.registerUser(user);
 
             if (success) {
+                response.setContentType("application/json");
                 response.setStatus(201); // Created
                 out.print("{\"message\":\"User registered successfully\"}");
             } else {
+                response.setContentType("application/json");
                 response.setStatus(400); // Bad Request
                 out.print("{\"message\":\"Registration failed\"}");
             }
@@ -79,6 +81,7 @@ public class AuthController extends HttpServlet {
                 out.print("{\"message\":\"User login successfully\"}");
             } else {
                 response.setStatus(401); // Unauthorized
+                response.setContentType("application/json");
                 out.print("{\"message\":\"Invalid credentials\"}");
             }
         }

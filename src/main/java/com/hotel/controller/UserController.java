@@ -113,11 +113,13 @@ public class UserController extends HttpServlet {
                 obj.put("role", user.getRole());
                 out.print(obj.toString());
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setContentType("application/json");
+                response.setStatus(404);
                 out.print("{\"message\":\"User not found\"}");
             }
         } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setContentType("application/json");
+            response.setStatus(400);
             out.print("{\"message\":\"Email parameter required\"}");
         }
     }
@@ -212,9 +214,12 @@ public class UserController extends HttpServlet {
         boolean updated = userService.updateUser(user);
 
         if (updated) {
+            response.setContentType("application/json");
+            response.setStatus(200);
             out.print("{\"message\":\"User updated successfully\"}");
         } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(400);
+            response.setContentType("application/json");
             out.print("{\"message\":\"Update failed\"}");
         }
     }
@@ -242,9 +247,12 @@ public class UserController extends HttpServlet {
         boolean deleted = userService.deleteUser(userId);
 
         if (deleted) {
+            response.setStatus(200);
+            response.setContentType("application/json");
             out.print("{\"message\":\"User deleted successfully\"}");
         } else {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(400);
+            response.setContentType("application/json");
             out.print("{\"message\":\"Delete failed\"}");
         }
     }
