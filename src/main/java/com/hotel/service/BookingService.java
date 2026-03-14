@@ -1,13 +1,22 @@
 package com.hotel.service;
 
 import com.hotel.dao.BookingDAO;
+import com.hotel.dao.RoomDAO;
 import com.hotel.model.Booking;
+import com.hotel.util.DBConnection;
 
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BookingService {
 
     private BookingDAO bookingDAO=new BookingDAO();
+    private RoomDAO roomDAO = new RoomDAO();
 
     public List<Booking> getAllBookings(){
         return bookingDAO.getAllBookings();
@@ -17,20 +26,38 @@ public class BookingService {
         return bookingDAO.getBookingById(id);
     }
 
-    public boolean createBooking(Booking booking){
-
-        if(booking.getCheckOut().before(booking.getCheckIn())){
-            throw new RuntimeException("Check-out must be after check-in");
-        }
-
-        return bookingDAO.createBooking(booking);
-    }
-
     public boolean updateBooking(Booking booking){
         return bookingDAO.updateBooking(booking);
     }
 
     public boolean deleteBooking(long id){
         return bookingDAO.deleteBooking(id);
+    }
+
+     // CREATE BOOKING
+    public boolean createBooking(Booking booking){
+
+        LocalDate checkIn = booking.getCheckIn().toLocalDate();
+        LocalDate checkOut = booking.getCheckOut().toLocalDate();
+
+        if(checkOut.isBefore(checkIn)){
+            throw new RuntimeException("Check-out must be after check-in");
+        }
+
+        // CALCULATE NUMBER OF DAYS
+        long days = ChronoUnit.DAYS.between(checkIn, checkOut);
+
+        if(days == 0) days = 1;
+
+        // GET ROOM PRICE
+        double price = roomDAO.getRoomPrice(booking.getRoomId());
+
+        double total = price * days;
+
+        booking.setTotalPrice(new java.math.BigDecimal(total));
+
+        booking.setStatus("CONFIRMED");
+
+        return bookingDAO.createBooking(booking);
     }
 }
