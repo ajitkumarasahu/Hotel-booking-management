@@ -133,4 +133,26 @@ public class RoomDAO {
 
         return false;
     }
+
+    public double getRoomPrice(long roomId) {
+
+        String sql = "SELECT price FROM rooms WHERE room_id=?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setLong(1, roomId);
+
+            ResultSet rs = ps.executeQuery();
+
+            if(rs.next()) {
+                return rs.getDouble("price");
+            }
+
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return 0;
+    }
 }

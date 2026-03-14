@@ -19,56 +19,56 @@ public class BookingController extends HttpServlet {
 
     private BookingService bookingService=new BookingService();
 
-    protected void doGet(HttpServletRequest req,HttpServletResponse resp)throws IOException{
+    // protected void doGet(HttpServletRequest req,HttpServletResponse resp)throws IOException{
 
-        String id=req.getParameter("bookingId");
+    //     String id=req.getParameter("bookingId");
 
-        resp.setContentType("application/json");
+    //     resp.setContentType("application/json");
 
-        if(id!=null){
+    //     if(id!=null){
 
-            Booking b=bookingService.getBookingById(Long.parseLong(id));
+    //         Booking b=bookingService.getBookingById(Long.parseLong(id));
 
-            JSONObject obj=new JSONObject();
+    //         JSONObject obj=new JSONObject();
 
-            obj.put("bookingId",b.getBookingId());
-            obj.put("userId",b.getUserId());
-            obj.put("roomId",b.getRoomId());
-            obj.put("checkIn",b.getCheckIn());
-            obj.put("checkOut",b.getCheckOut());
-            obj.put("totalPrice",b.getTotalPrice());
-            obj.put("status",b.getStatus());
+    //         obj.put("bookingId",b.getBookingId());
+    //         obj.put("userId",b.getUserId());
+    //         obj.put("roomId",b.getRoomId());
+    //         obj.put("checkIn",b.getCheckIn());
+    //         obj.put("checkOut",b.getCheckOut());
+    //         obj.put("totalPrice",b.getTotalPrice());
+    //         obj.put("status",b.getStatus());
 
-            resp.setContentType("application/json");
-            resp.setStatus(200);
-            resp.getWriter().print(obj);
+    //         resp.setContentType("application/json");
+    //         resp.setStatus(200);
+    //         resp.getWriter().print(obj);
 
-        }else{
+    //     }else{
 
-            List<Booking> list=bookingService.getAllBookings();
+    //         List<Booking> list=bookingService.getAllBookings();
 
-            JSONArray arr=new JSONArray();
+    //         JSONArray arr=new JSONArray();
 
-            for(Booking b:list){
+    //         for(Booking b:list){
 
-                JSONObject obj=new JSONObject();
+    //             JSONObject obj=new JSONObject();
 
-                obj.put("bookingId",b.getBookingId());
-                obj.put("userId",b.getUserId());
-                obj.put("roomId",b.getRoomId());
-                obj.put("checkIn",b.getCheckIn());
-                obj.put("checkOut",b.getCheckOut());
-                obj.put("totalPrice",b.getTotalPrice());
-                obj.put("status",b.getStatus());
+    //             obj.put("bookingId",b.getBookingId());
+    //             obj.put("userId",b.getUserId());
+    //             obj.put("roomId",b.getRoomId());
+    //             obj.put("checkIn",b.getCheckIn());
+    //             obj.put("checkOut",b.getCheckOut());
+    //             obj.put("totalPrice",b.getTotalPrice());
+    //             obj.put("status",b.getStatus());
 
-                arr.put(obj);
-            }
+    //             arr.put(obj);
+    //         }
 
-            resp.setContentType("application/json");
-            resp.setStatus(200);
-            resp.getWriter().print(arr);
-        }
-    }
+    //         resp.setContentType("application/json");
+    //         resp.setStatus(200);
+    //         resp.getWriter().print(arr);
+    //     }
+    // }
 
     protected void doPost(HttpServletRequest req,HttpServletResponse resp)throws IOException{
 
@@ -149,5 +149,55 @@ public class BookingController extends HttpServlet {
             resp.setStatus(400);
             resp.getWriter().print("{\"message\":\"Room Delete Failed\"}");
         }
+    }
+
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        resp.setContentType("application/json");
+
+        String bookingId = req.getParameter("bookingId");
+        String roomId = req.getParameter("roomId");
+
+        // 1️⃣ GET SINGLE BOOKING
+        if(bookingId != null){
+
+            Booking b = bookingService.getBookingById(Long.parseLong(bookingId));
+
+            JSONObject obj = new JSONObject();
+
+            obj.put("bookingId", b.getBookingId());
+            obj.put("userId", b.getUserId());
+            obj.put("roomId", b.getRoomId());
+            obj.put("checkIn", b.getCheckIn());
+            obj.put("checkOut", b.getCheckOut());
+            obj.put("totalPrice", b.getTotalPrice());
+            obj.put("status", b.getStatus());
+
+            resp.getWriter().print(obj);
+
+            return;
+        }
+
+        // 2️⃣GET ALL BOOKINGS
+        List<Booking> list = bookingService.getAllBookings();
+
+        JSONArray arr = new JSONArray();
+
+        for(Booking b:list){
+
+            JSONObject obj = new JSONObject();
+
+            obj.put("bookingId", b.getBookingId());
+            obj.put("userId", b.getUserId());
+            obj.put("roomId", b.getRoomId());
+            obj.put("checkIn", b.getCheckIn());
+            obj.put("checkOut", b.getCheckOut());
+            obj.put("totalPrice", b.getTotalPrice());
+            obj.put("status", b.getStatus());
+
+            arr.put(obj);
+        }
+
+        resp.getWriter().print(arr);
     }
 }
