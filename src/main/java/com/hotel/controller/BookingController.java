@@ -19,57 +19,6 @@ public class BookingController extends HttpServlet {
 
     private BookingService bookingService=new BookingService();
 
-    // protected void doGet(HttpServletRequest req,HttpServletResponse resp)throws IOException{
-
-    //     String id=req.getParameter("bookingId");
-
-    //     resp.setContentType("application/json");
-
-    //     if(id!=null){
-
-    //         Booking b=bookingService.getBookingById(Long.parseLong(id));
-
-    //         JSONObject obj=new JSONObject();
-
-    //         obj.put("bookingId",b.getBookingId());
-    //         obj.put("userId",b.getUserId());
-    //         obj.put("roomId",b.getRoomId());
-    //         obj.put("checkIn",b.getCheckIn());
-    //         obj.put("checkOut",b.getCheckOut());
-    //         obj.put("totalPrice",b.getTotalPrice());
-    //         obj.put("status",b.getStatus());
-
-    //         resp.setContentType("application/json");
-    //         resp.setStatus(200);
-    //         resp.getWriter().print(obj);
-
-    //     }else{
-
-    //         List<Booking> list=bookingService.getAllBookings();
-
-    //         JSONArray arr=new JSONArray();
-
-    //         for(Booking b:list){
-
-    //             JSONObject obj=new JSONObject();
-
-    //             obj.put("bookingId",b.getBookingId());
-    //             obj.put("userId",b.getUserId());
-    //             obj.put("roomId",b.getRoomId());
-    //             obj.put("checkIn",b.getCheckIn());
-    //             obj.put("checkOut",b.getCheckOut());
-    //             obj.put("totalPrice",b.getTotalPrice());
-    //             obj.put("status",b.getStatus());
-
-    //             arr.put(obj);
-    //         }
-
-    //         resp.setContentType("application/json");
-    //         resp.setStatus(200);
-    //         resp.getWriter().print(arr);
-    //     }
-    // }
-
     protected void doPost(HttpServletRequest req,HttpServletResponse resp)throws IOException{
 
         BufferedReader br=req.getReader();
