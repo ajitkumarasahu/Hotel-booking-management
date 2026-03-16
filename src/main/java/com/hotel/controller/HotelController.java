@@ -1,7 +1,9 @@
 package com.hotel.controller;
 
 import com.hotel.model.Hotel;
+import com.hotel.model.Room;
 import com.hotel.service.HotelService;
+import com.hotel.service.RoomService;
 
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
@@ -209,6 +211,39 @@ public class HotelController extends HttpServlet {
             response.setContentType("application/json");
             response.setStatus(400);
             out.print("{\"message\":\"Hotel Delete failed\"}");
+        }
+    }
+
+    protected void doGetRoomsByHotel(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+           
+    response.setContentType("application/json");
+    PrintWriter out = response.getWriter();
+
+    String hotelIdParam = request.getParameter("hotelId");
+
+        if(hotelIdParam != null){
+
+            long hotelId = Long.parseLong(hotelIdParam);
+
+            List<Room> rooms = new RoomService().getRoomsByHotel(hotelId);
+
+            JSONArray roomArray = new JSONArray();
+
+            for(Room r : rooms){
+
+                JSONObject obj = new JSONObject();
+
+                obj.put("roomId",r.getRoomId());
+                obj.put("roomType",r.getRoomType());
+                obj.put("price",r.getPrice());
+                obj.put("capacity",r.getCapacity());
+                obj.put("status",r.getStatus());
+
+                roomArray.put(obj);
+            }
+
+            response.getWriter().print(roomArray);
+            return;
         }
     }
 }

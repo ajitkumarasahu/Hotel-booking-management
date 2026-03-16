@@ -155,4 +155,38 @@ public class RoomDAO {
 
         return 0;
     }
+
+    public List<Room> getRoomsByHotelId(long hotelId){
+
+        List<Room> rooms = new ArrayList<>();
+
+        String sql = "SELECT * FROM rooms WHERE hotel_id=?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            ps.setLong(1,hotelId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+
+                Room r = new Room();
+
+                r.setRoomId(rs.getLong("room_id"));
+                r.setHotelId(rs.getLong("hotel_id"));
+                r.setRoomType(rs.getString("room_type"));
+                r.setPrice(rs.getBigDecimal("price"));
+                r.setCapacity(rs.getInt("capacity"));
+                r.setStatus(rs.getString("status"));
+
+                rooms.add(r);
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return rooms;
+    }
 }

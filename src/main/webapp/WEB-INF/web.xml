@@ -77,4 +77,15 @@
         <servlet-name>BookingController</servlet-name>
         <url-pattern>/api/bookings/*</url-pattern>
     </servlet-mapping>
+
+    <!-- Dashboard Controller -->
+    <servlet>
+        <servlet-name>DashboardController</servlet-name>
+        <servlet-class>com.hotel.controller.DashboardController</servlet-class>
+    </servlet>
+
+    <servlet-mapping>
+        <servlet-name>DashboardController</servlet-name>
+        <url-pattern>/api/dashboard</url-pattern>
+    </servlet-mapping>
 </web-app>
