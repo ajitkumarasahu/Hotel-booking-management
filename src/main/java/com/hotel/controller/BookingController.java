@@ -149,4 +149,32 @@ public class BookingController extends HttpServlet {
 
         resp.getWriter().print(arr);
     }
+
+    protected void doGetHistory(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        resp.setContentType("application/json");
+
+        long userId = Long.parseLong(req.getParameter("userId"));
+
+        List<Booking> list = bookingService.getBookingHistory(userId);
+
+        JSONArray arr = new JSONArray();
+
+        for(Booking b:list){
+
+            JSONObject obj = new JSONObject();
+
+            obj.put("bookingId", b.getBookingId());
+            obj.put("userId", b.getUserId());
+            obj.put("roomId", b.getRoomId());
+            obj.put("checkIn", b.getCheckIn());
+            obj.put("checkOut", b.getCheckOut());
+            obj.put("totalPrice", b.getTotalPrice());
+            obj.put("status", b.getStatus());
+
+            arr.put(obj);
+        }
+
+        resp.getWriter().print(arr);
+    }
 }

@@ -60,4 +60,13 @@ public class BookingService {
 
         return bookingDAO.createBooking(booking);
     }
+
+    public List<Booking> getBookingHistory(long userId){
+
+        if(userId <= 0){
+            throw new RuntimeException("Invalid user ID");
+        }
+
+        return bookingDAO.getBookingsByUserId(userId);
+    }
 }
