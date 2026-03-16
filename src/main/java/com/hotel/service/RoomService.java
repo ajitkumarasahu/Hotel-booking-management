@@ -33,4 +33,8 @@ public class RoomService {
     public boolean deleteRoom(long roomId) {
         return roomDAO.deleteRoom(roomId);
     }
+
+    public List<Room> getRoomsByHotel(long hotelId){
+        return roomDAO.getRoomsByHotelId(hotelId);
+    }
 }
