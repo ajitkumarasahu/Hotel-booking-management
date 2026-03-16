@@ -127,4 +127,39 @@ public class BookingDAO {
 
         return false;
     }
+
+    public List<Booking> getBookingsByUserId(long userId){
+
+        List<Booking> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM bookings WHERE user_id=? ORDER BY booking_id DESC";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            ps.setLong(1,userId);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+
+                Booking b = new Booking();
+
+                b.setBookingId(rs.getLong("booking_id"));
+                b.setUserId(rs.getLong("user_id"));
+                b.setRoomId(rs.getLong("room_id"));
+                b.setCheckIn(rs.getDate("check_in"));
+                b.setCheckOut(rs.getDate("check_out"));
+                b.setTotalPrice(rs.getBigDecimal("total_price"));
+                b.setStatus(rs.getString("status"));
+
+                list.add(b);
+            }
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return list;
+    }
 }
