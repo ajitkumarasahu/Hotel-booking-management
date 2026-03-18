@@ -100,4 +100,11 @@ public class HotelService {
 
         return hotelDAO.deleteHotel(id);
     }
+
+    public List<Hotel> searchHotels(String keyword, int page, int size){
+
+        int offset = (page - 1) * size;
+
+        return hotelDAO.searchHotels(keyword, offset, size);
+    }
 }

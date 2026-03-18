@@ -126,4 +126,34 @@ public class HotelDAO {
 
         return false;
     }
+
+    public List<Hotel> searchHotels(String keyword, int offset, int limit){
+
+        List<Hotel> list = new ArrayList<>();
+
+        String sql = "SELECT * FROM hotels WHERE name LIKE ? OR location LIKE ? LIMIT ? OFFSET ?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            ps.setString(1,"%"+keyword+"%");
+            ps.setString(2,"%"+keyword+"%");
+            ps.setInt(3,limit);
+            ps.setInt(4,offset);
+
+            ResultSet rs = ps.executeQuery();
+
+            while(rs.next()){
+                Hotel h = new Hotel();
+                h.setHotelId(rs.getInt("hotel_id"));
+                h.setName(rs.getString("name"));
+                h.setLocation(rs.getString("location"));
+                h.setDescription(rs.getString("description"));
+                list.add(h);
+            }
+
+        }catch(Exception e){ e.printStackTrace(); }
+
+        return list;
+    }
 }
