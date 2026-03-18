@@ -177,4 +177,25 @@ public class BookingController extends HttpServlet {
 
         resp.getWriter().print(arr);
     }
+
+    protected void doCancel(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+
+        String bookingId = req.getParameter("bookingId");
+
+        if(bookingId != null){
+
+            boolean result = bookingService.cancelBooking(Long.parseLong(bookingId));
+            PrintWriter out = resp.getWriter();
+            if(result){
+                resp.setContentType("application/json");
+                resp.setStatus(200);
+                out.print("{\"message\":\"Booking Cancelled successfully\"}");
+            } else {
+                resp.setContentType("application/json");
+                resp.setStatus(400);
+                out.print("{\"message\":\"Booking Cancel Failed\"}");
+            }
+
+        }
+    }
 }

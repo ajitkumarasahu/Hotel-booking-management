@@ -162,4 +162,22 @@ public class BookingDAO {
 
         return list;
     }
+
+    public boolean cancelBooking(long bookingId){
+
+        String sql = "UPDATE bookings SET status='CANCELLED' WHERE booking_id=?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            ps.setLong(1,bookingId);
+
+            return ps.executeUpdate()>0;
+
+        }catch(Exception e){ 
+            e.printStackTrace(); 
+        }
+
+        return false;
+    }
 }

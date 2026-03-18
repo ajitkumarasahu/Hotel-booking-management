@@ -246,4 +246,40 @@ public class HotelController extends HttpServlet {
             return;
         }
     }
+
+    protected void doSearch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+           
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        String search = request.getParameter("search");
+        String pageParam = request.getParameter("page");
+        String sizeParam = request.getParameter("size");
+
+        if(search != null){
+
+            int page = pageParam != null ? Integer.parseInt(pageParam) : 1;
+            int size = sizeParam != null ? Integer.parseInt(sizeParam) : 5;
+
+            List<Hotel> hotels = hotelService.searchHotels(search,page,size);
+
+            JSONArray arr = new JSONArray();
+
+            for(Hotel h : hotels){
+
+                 JSONObject obj = new JSONObject();
+                    obj.put("hotelId", h.getHotelId());
+                    obj.put("name", h.getName());
+                    obj.put("location", h.getLocation());
+                    obj.put("description", h.getDescription());
+
+                    arr.put(obj);
+                }
+
+                out.print(arr.toString());
+        }else{
+            response.setStatus(400);
+            out.print("{\"message\":\"Search parameter is required\"}");
+        }
+    }
 }

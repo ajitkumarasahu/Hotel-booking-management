@@ -69,4 +69,19 @@ public class BookingService {
 
         return bookingDAO.getBookingsByUserId(userId);
     }
+
+    public boolean cancelBooking(long bookingId){
+
+        Booking booking = bookingDAO.getBookingById(bookingId);
+
+        if(booking == null){
+            throw new RuntimeException("Booking not found");
+        }
+
+        if("CANCELLED".equals(booking.getStatus())){
+            throw new RuntimeException("Already cancelled");
+        }
+
+        return bookingDAO.cancelBooking(bookingId);
+    }
 }
