@@ -42,7 +42,7 @@ public class AuthController extends HttpServlet {
                     json.getString("email"),
                     json.getString("password"),
                     json.getString("phone"),
-                    "USER"
+                    json.getString("role")
             );
 
             boolean success = userService.registerUser(user);
@@ -50,7 +50,7 @@ public class AuthController extends HttpServlet {
             if (success) {
                 response.setContentType("application/json");
                 response.setStatus(201); // Created
-                out.print("{\"message\":\"User registered successfully\"}");
+                out.print("{\"message\":\"Registered successfully\"}");
             } else {
                 response.setContentType("application/json");
                 response.setStatus(400); // Bad Request
@@ -78,7 +78,7 @@ public class AuthController extends HttpServlet {
                 String token = JWTUtil.generateToken(user.getEmail(), user.getRole());
                 response.setStatus(200); // OK
                 out.print("{\"token\":\"" + token + "\"}");
-                out.print("{\"message\":\"User login successfully\"}");
+                out.print("{\"message\":\"login successfully\"}");
             } else {
                 response.setStatus(401); // Unauthorized
                 response.setContentType("application/json");
