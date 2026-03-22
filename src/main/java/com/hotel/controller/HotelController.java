@@ -31,6 +31,15 @@ public class HotelController extends HttpServlet {
     // GET ALL HOTELS
     @Generated(value = "UserController - GET /hotels")
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String role = (String) request.getAttribute("userRole");
+
+        // 🔐 ROLE CHECK
+        if(!"ADMIN".equals(role)){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("Access Denied: Admin Only");
+            return;
+        }
            
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -81,6 +90,15 @@ public class HotelController extends HttpServlet {
     // GET HOTEL BY ID
     @Generated(value = "UserController - GET /hotels/{id}")
     protected void GetbyId(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String role = (String) request.getAttribute("userRole");
+
+        // 🔐 ROLE CHECK
+        if(!"ADMIN".equals(role)){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("Access Denied: Admin Only");
+            return;
+        }
            
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
@@ -128,6 +146,15 @@ public class HotelController extends HttpServlet {
     // CREATE HOTEL
     @Generated(value = "UserController - POST /hotels")
     protected void doPost(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
+
+        String role = (String) request.getAttribute("userRole");
+
+        // 🔐 ROLE CHECK
+        if(!"ADMIN".equals(role)){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("Access Denied: Admin Only");
+            return;
+        }
             
         StringBuilder sb = new StringBuilder();
         String line;
@@ -162,6 +189,15 @@ public class HotelController extends HttpServlet {
     // UPDATE HOTEL
     @Generated(value = "UserController - PUT /hotels/{id}")
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String role = (String) request.getAttribute("userRole");
+
+        // 🔐 ROLE CHECK
+        if(!"ADMIN".equals(role)){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("Access Denied: Admin Only");
+            return;
+        }
            
         StringBuilder sb = new StringBuilder();
         String line;
@@ -196,6 +232,15 @@ public class HotelController extends HttpServlet {
     // DELETE HOTEL
     @Generated(value = "UserController - DELETE /hotels/{id}")
     protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        String role = (String) request.getAttribute("userRole");
+
+        // 🔐 ROLE CHECK
+        if(!"ADMIN".equals(role)){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("Access Denied: Admin Only");
+            return;
+        }
            
         int id = Integer.parseInt(request.getParameter("hotelId"));
 
@@ -215,36 +260,45 @@ public class HotelController extends HttpServlet {
     }
 
     protected void doGetRoomsByHotel(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-           
-    response.setContentType("application/json");
-    PrintWriter out = response.getWriter();
 
-    String hotelIdParam = request.getParameter("hotelId");
+        String role = (String) request.getAttribute("userRole");
 
-        if(hotelIdParam != null){
-
-            long hotelId = Long.parseLong(hotelIdParam);
-
-            List<Room> rooms = new RoomService().getRoomsByHotel(hotelId);
-
-            JSONArray roomArray = new JSONArray();
-
-            for(Room r : rooms){
-
-                JSONObject obj = new JSONObject();
-
-                obj.put("roomId",r.getRoomId());
-                obj.put("roomType",r.getRoomType());
-                obj.put("price",r.getPrice());
-                obj.put("capacity",r.getCapacity());
-                obj.put("status",r.getStatus());
-
-                roomArray.put(obj);
-            }
-
-            response.getWriter().print(roomArray);
+        // 🔐 ROLE CHECK
+        if(!"ADMIN".equals(role)){
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            response.getWriter().print("Access Denied: Admin Only");
             return;
         }
+           
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+
+        String hotelIdParam = request.getParameter("hotelId");
+
+            if(hotelIdParam != null){
+
+                long hotelId = Long.parseLong(hotelIdParam);
+
+                List<Room> rooms = new RoomService().getRoomsByHotel(hotelId);
+
+                JSONArray roomArray = new JSONArray();
+
+                for(Room r : rooms){
+
+                    JSONObject obj = new JSONObject();
+
+                    obj.put("roomId",r.getRoomId());
+                    obj.put("roomType",r.getRoomType());
+                    obj.put("price",r.getPrice());
+                    obj.put("capacity",r.getCapacity());
+                    obj.put("status",r.getStatus());
+
+                    roomArray.put(obj);
+                }
+
+                response.getWriter().print(roomArray);
+                return;
+            }
     }
 
     protected void doSearch(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

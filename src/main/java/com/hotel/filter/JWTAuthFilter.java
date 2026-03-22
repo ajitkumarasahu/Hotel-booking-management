@@ -35,6 +35,11 @@ public class JWTAuthFilter implements Filter {
         }
 
         String token = header.substring(7);
+        
+        String role = JWTUtil.getRole(token);
+
+        // store in request
+        req.setAttribute("userRole", role);
 
         if(JWTUtil.validateToken(token) == null){
             res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
