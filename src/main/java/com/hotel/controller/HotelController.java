@@ -36,8 +36,9 @@ public class HotelController extends HttpServlet {
 
         // 🔐 ROLE CHECK
         if(!"ADMIN".equals(role)){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("Access Denied: Admin Only");
+            response.setStatus(203);
+            response.setContentType("application/json");    
+            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
             return;
         }
            
@@ -95,8 +96,9 @@ public class HotelController extends HttpServlet {
 
         // 🔐 ROLE CHECK
         if(!"ADMIN".equals(role)){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("Access Denied: Admin Only");
+            response.setStatus(203);
+            response.setContentType("application/json");    
+            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
             return;
         }
            
@@ -151,8 +153,9 @@ public class HotelController extends HttpServlet {
 
         // 🔐 ROLE CHECK
         if(!"ADMIN".equals(role)){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("Access Denied: Admin Only");
+            response.setStatus(203);
+            response.setContentType("application/json");    
+            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
             return;
         }
             
@@ -194,8 +197,9 @@ public class HotelController extends HttpServlet {
 
         // 🔐 ROLE CHECK
         if(!"ADMIN".equals(role)){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("Access Denied: Admin Only");
+            response.setStatus(203);
+            response.setContentType("application/json");    
+            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
             return;
         }
            
@@ -237,8 +241,9 @@ public class HotelController extends HttpServlet {
 
         // 🔐 ROLE CHECK
         if(!"ADMIN".equals(role)){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("Access Denied: Admin Only");
+            response.setStatus(203);
+            response.setContentType("application/json");    
+            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
             return;
         }
            
@@ -265,8 +270,9 @@ public class HotelController extends HttpServlet {
 
         // 🔐 ROLE CHECK
         if(!"ADMIN".equals(role)){
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().print("Access Denied: Admin Only");
+            response.setStatus(203);
+            response.setContentType("application/json");    
+            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
             return;
         }
            
