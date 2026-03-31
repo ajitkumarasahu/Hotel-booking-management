@@ -156,4 +156,35 @@ public class HotelDAO {
 
         return list;
     }
+
+    public boolean bulkInsertHotels(List<Hotel> hotels){
+
+        String sql = "INSERT INTO hotels(name,location,description) VALUES(?,?,?)";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            conn.setAutoCommit(false); // 🔥 Transaction
+
+            for(Hotel h : hotels){
+
+                ps.setString(1,h.getName());
+                ps.setString(2,h.getLocation());
+                ps.setString(3,h.getDescription());
+
+                ps.addBatch(); // 🔥 add to batch
+            }
+
+            ps.executeBatch(); // 🔥 execute all
+
+            conn.commit();
+
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

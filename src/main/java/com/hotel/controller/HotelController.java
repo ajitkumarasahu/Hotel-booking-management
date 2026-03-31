@@ -20,9 +20,11 @@ import jakarta.servlet.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 // Java utilities
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.processing.Generated;
@@ -180,44 +182,81 @@ public class HotelController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)throws ServletException, IOException {
 
         // Role check
-        String role = (String) request.getAttribute("userRole");
-        if(!"ADMIN".equals(role)){
-            response.setStatus(203);
-            response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
-            return;
-        }
+            String role = (String) request.getAttribute("userRole");
+            if(!"ADMIN".equals(role)){
+                response.setStatus(203);
+                response.getWriter().print("{\"message\":\"Access Denied: Admin Only\"}");
+                return;
+            }
 
-        // Read request body
-        StringBuilder sb = new StringBuilder();
-        String line;
-        while((line=request.getReader().readLine())!=null){
-            sb.append(line);
-        }
+            // Read request body
+            BufferedReader reader = request.getReader();
+            StringBuilder json = new StringBuilder();
+            String line;
 
-        // Convert body to JSON
-        JSONObject json = new JSONObject(sb.toString());
+            while((line=reader.readLine())!=null){
+                json.append(line);
+            }
 
-        // Create Hotel object
-        Hotel hotel = new Hotel(
-                json.getString("name"),
-                json.getString("location"),
-                json.getString("description")
-        );
+            // Convert body to JSON
+            // JSONObject json = new JSONObject(json.toString());
 
-        // Call service to save
-        boolean created = hotelService.createHotel(hotel);
+            // 🔥 Detect ARRAY (bulk)
+            if(json.toString().startsWith("[")){
 
-        PrintWriter out = response.getWriter();
+                JSONArray arr = new JSONArray(json.toString());
 
-        if(created){
-            response.setStatus(201);
-            out.print("{\"message\":\"Hotel created successfully\"}");
+                List<Hotel> hotels = new ArrayList<>();
+
+                for(int i=0;i<arr.length();i++){
+
+                    JSONObject obj = arr.getJSONObject(i);
+
+                    Hotel h = new Hotel();
+
+                    h.setName(obj.getString("name"));
+                    h.setLocation(obj.getString("location"));
+                    h.setDescription(obj.getString("description"));
+
+                    hotels.add(h);
+                }
+
+                boolean result = hotelService.bulkAddHotels(hotels);
+                PrintWriter out = response.getWriter();
+
+            if(result){
+                response.setStatus(201);
+                out.print("{\"message\":\"Hotel created successfully\"}");
+            }else{
+                response.setStatus(400);
+                out.print("{\"message\":\"Hotel Creation failed\"}");
+            }
         }else{
-            response.setStatus(400);
-            out.print("{\"message\":\"Hotel Creation failed\"}");
+            // Convert body to JSON
+            JSONObject obj = new JSONObject(json.toString());
+
+            // Create hotel object
+            Hotel hotel = new Hotel(
+                obj.getString("name"),
+                obj.getString("location"),
+                obj.getString("description")
+            );
+
+            //call service to add hotel
+            boolean result = hotelService.createHotel(hotel);
+            
+            //create PrintWriter to send response
+            PrintWriter out = response.getWriter();
+
+            if(result){
+                response.setStatus(201);
+                out.print("{\"message\":\"Hotel created successfully\"}");
+            }else{
+                response.setStatus(400);
+                out.print("{\"message\":\"Hotel Creation failed\"}");
+            }
         }
     }
-
     // ====================== UPDATE HOTEL ======================
     @Generated(value = "UserController - PUT /hotels/{id}")
     protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
