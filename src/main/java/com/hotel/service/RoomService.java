@@ -37,4 +37,13 @@ public class RoomService {
     public List<Room> getRoomsByHotel(long hotelId){
         return roomDAO.getRoomsByHotelId(hotelId);
     }
+
+    public boolean bulkAddRooms(List<Room> rooms){
+
+        if(rooms == null || rooms.isEmpty()){
+            throw new RuntimeException("Room list empty");
+        }
+
+        return roomDAO.bulkInsertRooms(rooms);
+    }
 }
