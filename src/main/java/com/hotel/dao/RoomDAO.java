@@ -189,4 +189,36 @@ public class RoomDAO {
 
         return rooms;
     }
+
+    public boolean bulkInsertRooms(List<Room> rooms){
+
+        String sql = "INSERT INTO rooms (hotel_id, room_type, price, capacity, status) VALUES(?,?,?,?,?)";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            conn.setAutoCommit(false);
+
+            for(Room r : rooms){
+
+                ps.setLong(1,r.getHotelId());
+                ps.setString(2,r.getRoomType());
+                ps.setBigDecimal(3,r.getPrice());
+                ps.setInt(4,r.getCapacity());
+                ps.setString(5,r.getStatus());
+
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

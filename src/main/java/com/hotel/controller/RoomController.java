@@ -17,6 +17,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 
 import java.io.*; // For input/output handling
+import java.util.ArrayList;
 import java.util.List;
 
 // Annotation (not required for logic, just metadata)
@@ -167,29 +168,58 @@ public class RoomController extends HttpServlet {
             json.append(line);
         }
 
-        // Convert string to JSON object
-        JSONObject obj = new JSONObject(json.toString());
+        // 🔥 Bulk Insert
+        if(json.toString().startsWith("[")){
 
-        // Create Room object using JSON data
-        Room room = new Room(
-                obj.getLong("hotelId"),
-                obj.getString("roomType"),
-                obj.getBigDecimal("price"),
-                obj.getInt("capacity"),
-                obj.getString("status")
-        );
+            JSONArray arr = new JSONArray(json.toString());
 
-        // Call service to save room
-        boolean result = roomService.addRoom(room);
+            List<Room> rooms = new ArrayList<>();
 
-        // Send response
-        if(result){
-            resp.setStatus(201); // Created
-            resp.getWriter().print("{\"created\":Room added successfully }");
-        } else {
-            resp.setStatus(400);
-            resp.getWriter().print("{\"created\":Failed to add room }");  
-        }
+            for(int i=0;i<arr.length();i++){
+
+                JSONObject obj = arr.getJSONObject(i);
+
+                Room r = new Room();
+
+                r.setHotelId(obj.getLong("hotelId"));
+                r.setRoomType(obj.getString("roomType"));
+                r.setPrice(obj.getBigDecimal("price"));
+                r.setCapacity(obj.getInt("capacity"));
+                r.setStatus(obj.getString("status"));
+
+                rooms.add(r);
+            }
+
+            boolean result = roomService.bulkAddRooms(rooms);
+            if(result){
+                resp.setStatus(201); // Created
+                resp.getWriter().print("{\"created\":Rooms added successfully }");
+            } else {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"created\":Failed to add rooms }");  
+            }
+        } else { // Single Insert
+
+            JSONObject obj = new JSONObject(json.toString());
+
+            Room room = new Room();
+
+            room.setHotelId(obj.getLong("hotelId"));
+            room.setRoomType(obj.getString("roomType"));
+            room.setPrice(obj.getBigDecimal("price"));
+            room.setCapacity(obj.getInt("capacity"));
+            room.setStatus(obj.getString("status"));
+
+            boolean result = roomService.addRoom(room);
+
+            if(result){
+                resp.setStatus(201); // Created
+                resp.getWriter().print("{\"created\":Room added successfully }");
+            } else {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"created\":Failed to add room }");  
+            }
+        } 
     }
 
     // ===================== UPDATE ROOM =====================
