@@ -107,4 +107,13 @@ public class HotelService {
 
         return hotelDAO.searchHotels(keyword, offset, size);
     }
+
+    public boolean bulkAddHotels(List<Hotel> hotels){
+
+        if(hotels == null || hotels.isEmpty()){
+            throw new RuntimeException("Hotel list is empty");
+        }
+
+        return hotelDAO.bulkInsertHotels(hotels);
+    }
 }
