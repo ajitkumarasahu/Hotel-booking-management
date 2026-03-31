@@ -116,4 +116,22 @@ public class HotelService {
 
         return hotelDAO.bulkInsertHotels(hotels);
     }
+
+    public boolean bulkUpdateHotels(List<Hotel> hotels){
+
+        if(hotels == null || hotels.isEmpty()){
+            throw new RuntimeException("Hotel list is empty");
+        }
+
+        return hotelDAO.bulkUpdateHotels(hotels);
+    }
+
+    public boolean bulkDeleteHotels(List<Long> ids){
+
+        if(ids == null || ids.isEmpty()){
+            throw new RuntimeException("ID list empty");
+        }
+
+        return hotelDAO.bulkDeleteHotels(ids);
+    }
 }

@@ -276,26 +276,61 @@ public class HotelController extends HttpServlet {
             sb.append(line);
         }
 
-        JSONObject json = new JSONObject(sb.toString());
+        //Bulk update detection
+        if(sb.toString().startsWith("[")){
 
-        // Set updated data
-        Hotel hotel = new Hotel();
-        hotel.setHotelId(json.getInt("hotelId"));
-        hotel.setName(json.getString("name"));
-        hotel.setLocation(json.getString("location"));
-        hotel.setDescription(json.getString("description"));
+            JSONArray arr = new JSONArray(sb.toString());
 
-        // Update in DB
-        boolean updated = hotelService.updateHotel(hotel);
+            List<Hotel> hotels = new ArrayList<>();
 
-        PrintWriter out = response.getWriter();
+            for(int i=0;i<arr.length();i++){
 
-        if(updated){
-            response.setStatus(200);
-            out.print("{\"message\":\"Hotel updated Successfully\"}");
+                JSONObject obj = arr.getJSONObject(i);
+
+                Hotel h = new Hotel();
+
+                h.setHotelId(obj.getInt("hotelId"));
+                h.setName(obj.getString("name"));
+                h.setLocation(obj.getString("location"));
+                h.setDescription(obj.getString("description"));
+
+                hotels.add(h);
+            }
+
+            boolean result = hotelService.bulkUpdateHotels(hotels);
+            PrintWriter out = response.getWriter();
+
+            if(result){
+                response.setStatus(200);
+                out.print("{\"message\":\"Hotels updated successfully\"}");
+            }else{
+                response.setStatus(400);
+                out.print("{\"message\":\"Hotel Update failed\"}");
+            }
         }else{
-            response.setStatus(400);
-            out.print("{\"message\":\"Hotel Update failed\"}");
+            // Convert body to JSON
+            JSONObject obj = new JSONObject(sb.toString());
+
+            // Create hotel object
+            Hotel hotel = new Hotel();
+            hotel.setHotelId(obj.getInt("hotelId"));
+            hotel.setName(obj.getString("name"));
+            hotel.setLocation(obj.getString("location"));
+            hotel.setDescription(obj.getString("description"));
+
+            //call service to update hotel
+            boolean result = hotelService.updateHotel(hotel);
+            
+            //create PrintWriter to send response
+            PrintWriter out = response.getWriter();
+
+            if(result){
+                response.setStatus(200);
+                out.print("{\"message\":\"Hotel updated successfully\"}");
+            }else{
+                response.setStatus(400);
+                out.print("{\"message\":\"Hotel Update failed\"}");
+            }
         }
     }
 
@@ -311,23 +346,52 @@ public class HotelController extends HttpServlet {
             return;
         }
 
-        // Get hotelId
-        int id = Integer.parseInt(request.getParameter("hotelId"));
+        BufferedReader reader = request.getReader();
+        StringBuilder json = new StringBuilder();
+        String line;
 
-        // Delete hotel
-        boolean deleted = hotelService.deleteHotel(id);
-
-        PrintWriter out = response.getWriter();
-
-        if(deleted){
-            response.setStatus(200);
-            out.print("{\"message\":\"Hotel deleted Successfully\"}");
-        }else{
-            response.setStatus(400);
-            out.print("{\"message\":\"Hotel Delete failed\"}");
+        while((line = reader.readLine()) != null){
+            json.append(line);
         }
-    }
 
+        // 🔥 BULK DELETE
+        if(json.toString().startsWith("[")){
+
+            JSONArray arr = new JSONArray(json.toString());
+
+            List<Long> ids = new ArrayList<>();
+
+            for(int i=0;i<arr.length();i++){
+                ids.add(arr.getLong(i));
+            }
+            boolean result = hotelService.bulkDeleteHotels(ids);
+            if(result){
+                response.setStatus(200);
+                response.getWriter().print("{\"message\":\"Hotels deleted successfully\"}");
+            }else{
+                response.setStatus(400);
+                response.getWriter().print("{\"message\":\"Hotel Deletion failed\"}");
+            }
+        }else{
+            // Get hotelId
+            int id = Integer.parseInt(request.getParameter("hotelId"));
+
+            // Delete hotel
+            boolean deleted = hotelService.deleteHotel(id);
+
+            PrintWriter out = response.getWriter();
+
+            if(deleted){
+                response.setStatus(200);
+                out.print("{\"message\":\"Hotel deleted Successfully\"}");
+            }else{
+                response.setStatus(400);
+                out.print("{\"message\":\"Hotel Delete failed\"}");
+            }
+            
+        }
+
+    }
     // ====================== GET ROOMS BY HOTEL ======================
     protected void doGetRoomsByHotel(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 
