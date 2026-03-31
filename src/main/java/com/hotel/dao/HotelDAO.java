@@ -187,4 +187,61 @@ public class HotelDAO {
 
         return false;
     }
+
+    public boolean bulkUpdateHotels(List<Hotel> hotels){
+
+        String sql = "UPDATE hotels SET name=?, location=?, description=? WHERE hotel_id=?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            conn.setAutoCommit(false);
+
+            for(Hotel h : hotels){
+
+                ps.setString(1,h.getName());
+                ps.setString(2,h.getLocation());
+                ps.setString(3,h.getDescription());
+                ps.setLong(4,h.getHotelId());
+
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean bulkDeleteHotels(List<Long> ids){
+
+        String sql = "DELETE FROM hotels WHERE hotel_id=?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            conn.setAutoCommit(false);
+
+            for(Long id : ids){
+                ps.setLong(1,id);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }
