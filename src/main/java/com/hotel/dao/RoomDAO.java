@@ -221,4 +221,63 @@ public class RoomDAO {
 
         return false;
     }
+
+    public boolean bulkUpdateRooms(List<Room> rooms){
+
+        String sql = "UPDATE rooms SET hotel_id=?, room_type=?, price=?, capacity=?, status=? WHERE room_id=?";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            conn.setAutoCommit(false);
+
+            for(Room r : rooms){
+
+                ps.setLong(1, r.getHotelId());
+                ps.setString(2, r.getRoomType());
+                ps.setBigDecimal(3, r.getPrice());
+                ps.setInt(4, r.getCapacity());
+                ps.setString(5, r.getStatus());
+                ps.setLong(6, r.getRoomId());
+
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    public boolean bulkDeleteRooms(List<Long> roomIds){
+
+        String sql = "DELETE FROM rooms WHERE room_id IN (" + String.join(",", Collections.nCopies(roomIds.size(), "?")) + ")";
+
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql)){
+
+            conn.setAutoCommit(false);
+
+            for(Long id : roomIds){
+                ps.setLong(1, id);
+                ps.addBatch();
+            }
+
+            ps.executeBatch();
+            conn.commit();
+
+            return true;
+
+        }catch(Exception e){
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

@@ -235,29 +235,58 @@ public class RoomController extends HttpServlet {
             json.append(line);
         }
 
-        JSONObject obj = new JSONObject(json.toString());
+        if(json.toString().startsWith("[")){
 
-        // Create empty Room object
-        Room room = new Room();
+            JSONArray arr = new JSONArray(json.toString());
 
-        // Set values from JSON
-        room.setRoomId(obj.getLong("roomId"));
-        room.setHotelId(obj.getLong("hotelId"));
-        room.setRoomType(obj.getString("roomType"));
-        room.setPrice(obj.getBigDecimal("price"));
-        room.setCapacity(obj.getInt("capacity"));
-        room.setStatus(obj.getString("status"));
+            List<Room> rooms = new ArrayList<>();
 
-        // Update room
-        boolean result = roomService.updateRoom(room);
+            for(int i=0;i<arr.length();i++){
 
-        // Send response
-        if(result){
-            resp.setStatus(200);
-            resp.getWriter().print("{\"updated\":Room updated successfully }");
+                JSONObject obj = arr.getJSONObject(i);
+
+                Room r = new Room();
+
+                r.setRoomId(obj.getLong("roomId"));
+                r.setHotelId(obj.getLong("hotelId"));
+                r.setRoomType(obj.getString("roomType"));
+                r.setPrice(obj.getBigDecimal("price"));
+                r.setCapacity(obj.getInt("capacity"));
+                r.setStatus(obj.getString("status"));
+
+                rooms.add(r);
+            }
+
+            boolean result = roomService.bulkUpdateRooms(rooms);
+            if(result){
+                resp.setStatus(200); 
+                resp.getWriter().print("{\"updated\":Rooms updated successfully }");
+            } else {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"updated\":Failed to update rooms }");  
+            }
         } else {
-            resp.setStatus(400);
-            resp.getWriter().print("{\"updated\":Failed to update room }");  
+
+            JSONObject obj = new JSONObject(json.toString());
+
+            Room room = new Room();
+
+            room.setRoomId(obj.getLong("roomId"));
+            room.setHotelId(obj.getLong("hotelId"));
+            room.setRoomType(obj.getString("roomType"));
+            room.setPrice(obj.getBigDecimal("price"));
+            room.setCapacity(obj.getInt("capacity"));
+            room.setStatus(obj.getString("status"));
+
+            boolean result = roomService.updateRoom(room);
+
+            if(result){
+                resp.setStatus(200); 
+                resp.getWriter().print("{\"updated\":Room updated successfully }");
+            } else {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"updated\":Failed to update room }");  
+            }
         }
     }
     
@@ -265,19 +294,48 @@ public class RoomController extends HttpServlet {
     @Generated(value = "RoomController - DELETE /api/rooms")
     protected void doDelete(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
-        // Get roomId from request parameter
-        long id = Long.parseLong(req.getParameter("roomId"));
+        BufferedReader reader = req.getReader();
+        StringBuilder json = new StringBuilder();
+        String line;
 
-        // Delete room
-        boolean result = roomService.deleteRoom(id);
+        while((line = reader.readLine()) != null){
+            json.append(line);
+        }
 
-        // Send response
-        if(result){
-            resp.setStatus(200);
-            resp.getWriter().print("{\"deleted\":Room deleted successfully }");
+        if(json.toString().startsWith("[")){
+
+            JSONArray arr = new JSONArray(json.toString());
+
+            List<Long> roomIds = new ArrayList<>();
+
+            for(int i=0;i<arr.length();i++){
+                roomIds.add(arr.getLong(i));
+            }
+
+            boolean result = roomService.bulkDeleteRooms(roomIds);
+            if(result){
+                resp.setStatus(200); 
+                resp.getWriter().print("{\"deleted\":Rooms deleted successfully }");
+            } else {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"deleted\":Failed to delete rooms }");  
+            }
         } else {
-            resp.setStatus(400);
-            resp.getWriter().print("{\"deleted\":Failed to delete room }");  
+
+            // Get roomId from request parameter
+            long id = Long.parseLong(req.getParameter("roomId"));
+
+             // Delete room
+            boolean result = roomService.deleteRoom(id);
+
+             // Send response
+            if(result){
+                resp.setStatus(200);
+                resp.getWriter().print("{\"deleted\":Room deleted successfully }");
+            } else {
+                resp.setStatus(400);
+                resp.getWriter().print("{\"deleted\":Failed to delete room }");  
+            }
         }
     }
 }

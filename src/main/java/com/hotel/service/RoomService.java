@@ -46,4 +46,22 @@ public class RoomService {
 
         return roomDAO.bulkInsertRooms(rooms);
     }
+
+    public boolean bulkUpdateRooms(List<Room> rooms){
+
+        if(rooms == null || rooms.isEmpty()){
+            throw new RuntimeException("Room list empty");
+        }
+
+        return roomDAO.bulkUpdateRooms(rooms);
+    }
+
+    public boolean bulkDeleteRooms(List<Long> roomIds){
+
+        if(roomIds == null || roomIds.isEmpty()){
+            throw new RuntimeException("Room ID list empty");
+        }
+
+        return roomDAO.bulkDeleteRooms(roomIds);
+    }
 }
